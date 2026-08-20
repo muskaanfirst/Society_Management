@@ -1,0 +1,226 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+% -----------------------------------------------------
+% bvraghav-tiet-ucs503p-article.sty
+% -----------------------------------------------------
+
+% Variable: Lab Instructor
+\makeatletter \newcommand{\BvrSetLabInstructor}[1]{%
+  \gdef\Bvr@LabInstructor{#1}}
+% default
+\newcommand{\Bvr@LabInstructor}{Dr. Raghav %
+  B. Venkataramaiyer}
+% public accessor
+\newcommand{\BvrLabInstructorValue}{\Bvr@LabInstructor}
+\makeatother
+
+% Add subtitle
+\usepackage{titling}
+% -- Set title bold
+\pretitle{\begin{center}\bfseries\fontsize{18bp}{18bp}\selectfont}
+\makeatletter
+\newcommand{\BvrSubtitle}[1]{%
+  \posttitle{%
+    \par\end{center}
+    \begin{center}\large#1\end{center}
+    \vskip 0.5em}%
+}
+\makeatother
+
+% -----------------------------------------------------
+
+\title{Project SocMag: University Society Discovery, Dual-Track Recruitment \& Digital Ticketing Ecosystem}
+
+\BvrSetLabInstructor{Dr. Raghav B. Venkataramaiyer}
+
+\BvrSubtitle{%
+  Project Proposal for UCS503P \\
+  Submitted to: \BvrLabInstructorValue \\ \bfseries
+  Thapar Institute of Engineering and Technology%
+}
+
+\author{
+  Member 1: Aishna Jindal%
+  \thanks{Role: Frontend UI/UX, Dynamic Ticketing \& Showcase Visualizations. Roll No: \texttt{1024170247}, %
+    Email: \texttt{aaishna\_be24\@thapar.edu}}
+  \and 
+  Member 2: Muskaan Singhal%
+  \thanks{Role: Database Architecture, Dual-Track Assessment \& BCNF Optimization. Roll No: \texttt{1024170248}, %
+    Email: \texttt{msinghal\_be24\@thapar.edu}}
+  \and 
+  Member 3: Shivani Shrivastava%
+  \thanks{Role: Math Engine (MLE), Auto-Grading Proctoring \& QR Microservice. Roll No: \texttt{1024170278}, %
+    Email: \texttt{sshrivastava\_be24\@thapar.edu}}
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Higher-order goal}
+This project aims to modernize and centralize student extracurricular discovery, recruitment, and event engagement across university societies (e.g., CCS, OWASP, ACM, IEEE, MUDRA, FAPS, Pratibha, EDC). While organizational management spans wide institutional domains, the immediate engineering objective is to translate \emph{Maximum Likelihood Estimation (MLE) applicant matching, proctored dual-track evaluation, real-time audition slot scheduling, centralized event feeds, and QR-based digital ticketing} into a deployable, high-throughput software ecosystem.
+
+\section{Time-to-value}
+\begin{itemize}[leftmargin=0.7cm]
+    \item We will deliver meaningful increments quickly by prototyping the interactive society showcase, MLE-based Compatibility Engine, and applicant tracker dashboard within a short iteration window.
+    \item We will prioritize fast feedback over perfection by using weekly agile sprints backed by CI automation to validate judge rubric panels and proctored technical assessment workflows early.
+    \item Success is defined by deploying a functional showcase, dual-track recruitment flow (Technical \& Cultural), and dynamic QR ticketing with feedback integration in Sprint 1, then refining statistical persona modeling and anti-cheat algorithms based on pilot feedback.
+\end{itemize}
+
+\section{Problem Statement}
+During campus recruitment drives and major event seasons, first-year students blindly apply to dozens of societies without knowing cultural or domain fit, while societies struggle with unorganized recruitment pipelines and fragmented event management. Core committees face severe operational friction across discovery, assessment, and event handling. Common pain points include:
+\begin{itemize}[leftmargin=0.7cm]
+    \item \textbf{Unfiltered Applicant Floods \& Misalignment:} Students apply blindly without clear visibility into society domains (Technical, Cultural, Literary, Entrepreneurial) or skill compatibility.
+    \item \textbf{Recruitment Bottlenecks across Tracks:} Technical societies (CCS, OWASP, ACM, IEEE) lack integrated, proctored testing environments with anti-cheat logging, while cultural and non-technical societies (MUDRA, FAPS, Pratibha, EDC) suffer from chaotic physical audition queues and media handling.
+    \item \textbf{Subjective \& Unstandardized Grading:} Interview evaluations are frequently fragmented across unstructured spreadsheets without dynamic rubric aggregation for panel judges.
+    \item \textbf{Campus Event Ticketing \& Feedback Friction:} Event announcements and registrations are decentralized, paper/manual gate check-ins cause massive entrance delays, and post-event feedback collection is disjointed.
+\end{itemize}
+
+\textbf{Why this matters now (contextual relevance):} In a dense institutional ecosystem, integrating intelligent MLE persona matching, dynamic audition slotting, proctored domain testing, and centralized event feeds eliminates administrative burnout and maximizes student engagement.
+
+\section{Proposed Solution}
+\subsection{Overview}
+Build a comprehensive web platform titled \textbf{Project SocMag} featuring three integrated core modules:
+\begin{itemize}[leftmargin=0.7cm]
+    \item \textbf{Module 1: Discovery, Onboarding \& Statistical Matching:} Interactive society profiles, dynamic feature vector extraction paired with a Maximum Likelihood Estimation (MLE) engine to compute a statistically sound \emph{Compatibility Score (\%)} against a society's "ideal persona," and a unified application tracker dashboard ($\text{Applied} \rightarrow \text{Test/Audition Scheduled} \rightarrow \text{Interviewing} \rightarrow \text{Selected}$).
+    \item \textbf{Module 2: Dual-Track Recruitment Engine:}
+    \begin{itemize}
+        \item \textbf{Track A (Technical Societies - CCS, OWASP, ACM, IEEE):} In-app assessment module featuring automated MCQ and coding tests for Data Structures \& Algorithms (DSA), Web Development, and Cybersecurity domains, coupled with a time-bound proctored test window featuring tab-switch detection and anti-cheat event logging.
+        \item \textbf{Track B (Non-Technical \& Cultural Societies - MUDRA, FAPS, Pratibha, EDC):} Direct upload interface for design portfolios (FAPS), audition video clips (MUDRA/Pratibha), or business pitches (EDC); a real-time audition slot booking system for in-person interviews to eliminate physical lines; and a private Recruiter Rubric \& Judge Panel UI allowing core committee members to grade applicants on explicit parameters (e.g., Confidence, Technique, Creativity) with automated aggregate score calculations.
+    \end{itemize}
+    \item \textbf{Module 3: Society Events \& Digital Ticketing:} Centralizes event announcements, registrations, and attendance tracking across campus via a Unified Campus Event Feed (a categorized timeline of upcoming hackathons, workshops, cultural nights, and guest lectures across all societies), dynamic RSVP generating Event QR Passes, live venue gate scanning, and an integrated post-event Feedback Pipeline.
+\end{itemize}
+
+\subsection{Core workflow}
+\begin{enumerate}[leftmargin=0.7cm]
+    \item Freshers complete the onboarding profile; the MLE engine evaluates their feature vector against ideal society personas to display dynamic Compatibility Scores across profiles.
+    \item Applicants submit applications via the central dashboard:
+    \begin{itemize}
+        \item \textbf{Track A applicants} enter the time-bound test environment to complete auto-graded DSA, Web Dev, or Cybersecurity tests under proctored anti-cheat monitoring.
+        \item \textbf{Track B applicants} upload portfolios/videos/pitches and reserve dynamic real-time physical audition time slots.
+    \end{itemize}
+    \item Committee judges evaluate Track A auto-scores or grade Track B candidates using private rubric boards with dynamic parameter aggregation (Confidence, Technique, Creativity).
+    \item Students explore the Unified Campus Event Feed, register for dynamic QR event passes, check in at the venue via optical gate scanners, and complete post-event forms via the feedback portal.
+\end{enumerate}
+
+\subsection{Operational constraints for an educational campus setting}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Maintain sub-second responsiveness during peak assessment submission and event gate check-in hours.
+    \item Decouple code execution, anti-cheat detection, and statistical MLE matching into dedicated backend microservices.
+    \item Ensure dynamic client-side rendering for real-time QR validation and audition slot booking synchronization.
+\end{itemize}
+
+\section{Solution Approach}
+This engineering project emphasizes robust software architectural design, proctored assessment pipelines, statistical likelihood estimation, and relational database normalization.
+
+\subsection{Statistical \& Mathematical Engine}
+The platform relies on rigorous mathematical and algorithmic models:
+\begin{itemize}[leftmargin=0.7cm]
+    \item \textbf{MLE Compatibility Engine:} Models the "ideal persona" of each society as a parametrized probability distribution $\theta_{\text{society}}$. The engine maps applicant attributes, domain experience, and personality traits into a feature vector $\mathbf{x}$. It computes the likelihood function $L(\theta_{\text{society}} \mid \mathbf{x}) = P(\mathbf{x} \mid \theta_{\text{society}})$ using Maximum Likelihood Estimation (MLE) to generate a normalized, statistically sound Compatibility Score ($0 - 100\%$).
+    \item \textbf{Track A Auto-Grading \& Proctoring Engine:} Executes time-bound test evaluations for coding and MCQ formats across DSA, Web Dev, and Cybersecurity. Computes dynamic scores while logging tab-switch frequency and focus-loss duration for anti-cheat scoring.
+    \item \textbf{Track B Slot Scheduling \& Rubric Aggregation:} Models candidate physical throughput to assign non-overlapping audition slots dynamically. Aggregates multi-judge scores across weighted parameters ($\text{Score} = \sum w_i \cdot \text{Param}_i$) for Confidence, Technique, and Creativity.
+\end{itemize}
+
+\subsection{Web \& Data Architecture}
+A scalable decoupled multi-tier architecture:
+\begin{itemize}[leftmargin=0.7cm]
+    \item \textbf{Frontend:} Next.js (React) with Framer Motion transitions, Chart.js radar charts for rubric visualization, dynamic QR code generation, and HTML5 camera scanning.
+    \item \textbf{Backend API:} Node.js (Express) handling RESTful endpoints, audition slot reservations, applicant state transitions, and event feeds.
+    \item \textbf{Execution \& Math Microservice:} Python microservice executing code auto-grading, tab-switch anomaly logging, MLE Compatibility calculations, and automated PDF certificate/report generation.
+    \item \textbf{Database:} PostgreSQL relational schema strictly normalized to BCNF (\texttt{Users}, \texttt{Societies}, \texttt{Applications}, \texttt{Test\_Submissions}, \texttt{Media\_Uploads}, \texttt{Slot\_Bookings}, \texttt{Rubric\_Grades}, \texttt{Event\_Tickets}, \texttt{Feedback\_Responses}).
+\end{itemize}
+
+\subsection{SE Lifecycle, Integration, \& CI/CD}
+Software engineering practices include:
+\begin{itemize}[leftmargin=0.7cm]
+    \item \textbf{Agile/XP Sprints:} Scrum velocity tracking with structured User Stories across all three modules.
+    \item \textbf{Formal Design Artifacts:} Data Flow Diagrams (DFDs), Entity-Relationship (ER) diagrams, and BCNF schema validation.
+    \item \textbf{Testing \& CI/CD Automation:} Controller-service separation, white-box testing for auto-grading and MLE likelihood logic, and automated GitHub Actions deployment pipelines.
+\end{itemize}
+
+\section{Evaluation Criterion}
+We measure project success using quantitative metrics derived from campus recruitment and ticketing operational data.
+
+\subsection{Primary evaluation metric}
+\textbf{Recruitment \& Event Operational Throughput:} Total latency reduced across audition processing and gate check-in execution.
+\begin{itemize}[leftmargin=0.7cm]
+    \item Target: Reduction of physical audition queue wait times by $\ge 40\%$ through real-time slot reservation and gate check-in time to $< 1$ second per verification.
+    \item Attribution: Database microsecond timestamps logging pass scans, candidate slot arrivals, and judge evaluation submissions.
+\end{itemize}
+
+\subsection{Secondary evaluation metrics}
+\begin{itemize}[leftmargin=0.7cm]
+    \item \textbf{Proctoring Integrity:} Low false-positive rates in tab-switch and anti-cheat event detection during Track A technical assessments.
+    \item \textbf{MLE Match Relevance:} High statistical correlation between the computed MLE Compatibility Score and applicant conversion rate into active members.
+    \item \textbf{Judge Rubric Reliability:} High inter-rater consistency across aggregated multi-judge scores in Track B auditions.
+\end{itemize}
+
+\subsection{Pilot validation plan}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Deploy pilot across 100+ first-year students and 8 diverse campus societies (Technical: CCS, OWASP, ACM, IEEE; Non-Technical/Cultural: MUDRA, FAPS, Pratibha, EDC).
+    \item Measure recruitment throughput, gate scan speeds, media upload handling, and candidate satisfaction against traditional manual drives.
+\end{itemize}
+
+\section{Scalability}
+The solution scales both theoretically and operationally to handle institute-wide recruitment drives and high-density events.
+
+\begin{enumerate}[leftmargin=0.7cm]
+    \item \textbf{Scalable (theoretically):} Supports high concurrent loads during campus-wide drives and event check-ins by:
+    \begin{itemize}[leftmargin=0.7cm]
+        \item decoupling heavy code execution, media processing, and MLE computation into isolated asynchronous microservices,
+        \item leveraging BCNF database indexing for low-latency query performance during slot reservations,
+        \item enforcing stateless JWT authentication across RESTful API endpoints.
+    \end{itemize}
+    
+    \item \textbf{Operationally deployable (practically):}
+    \begin{itemize}[leftmargin=0.7cm]
+        \item containerized microservices managed via Docker,
+        \item cloud PostgreSQL database hosting,
+        \item automated continuous deployment pipelines via GitHub Actions.
+    \end{itemize}
+\end{enumerate}
+
+\section{Engine availability heuristic}
+Mature development stacks exist to rapidly build and deploy this system:
+\begin{itemize}[leftmargin=0.7cm]
+    \item Next.js and Express (Node.js) for high-performance visual dashboards, event feeds, and REST API management.
+    \item Python (SciPy, NumPy, ReportLab) runtime environment for MLE statistical modeling, code auto-grading, proctoring logging, and dynamic report generation.
+    \item PostgreSQL relational DBMS with BCNF-compliant schema execution.
+    \item HTML5-QRCode and Chart.js for real-time mobile camera scanning and visual rubric analytics.
+    \item GitHub Actions for automated unit testing and staging builds.
+\end{itemize}
+
+\section{Project scope and deliverables}
+\subsection{Initial deliverable}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Interactive society showcase profiles and MLE-based persona onboarding module with Compatibility Scoring.
+    \item Initial PostgreSQL BCNF relational schema deployment for users, societies, and applications.
+    \item Centralized student application tracking dashboard ($\text{Applied} \rightarrow \text{Selected}$).
+    \item Automated CI pipeline verifying core API endpoints and MLE math calculations.
+\end{itemize}
+
+\subsection{Subsequent deliverables}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Track A in-app assessment module (MCQ \& coding for DSA, Web Dev, Cybersecurity) with proctoring tab-switch logging.
+    \item Track B direct media upload interface (portfolios/videos/pitches), real-time audition slot booking system, and judge rubric board.
+    \item Module 3 Unified Campus Event Feed, dynamic QR pass generator, live gate scanning UI, and post-event Feedback Pipeline.
+\end{itemize}
+
+\section{Risks and mitigations}
+\begin{itemize}[leftmargin=0.7cm]
+    \item \textbf{Proctoring Anti-Cheat False Positives:} Implement configurable tab-switch delay thresholds and log full event sequences rather than instant test termination.
+    \item \textbf{Large Media Upload Payload Spikes (Track B):} Enforce client-side image/video compression and direct-to-cloud signed URL uploads to reduce server memory pressure.
+    \item \textbf{Subjective Evaluation Bias in Auditions:} Enforce standardized multi-parameter rubric scoring (Confidence, Technique, Creativity) with dynamic inter-judge normalization.
+    \item \textbf{High-Density Event Gate Network Congestion:} Implement client-side cryptographic QR validation with cached public keys for offline verification.
+\end{itemize}
+
+\section{Summary}
+Project SocMag presents a unified campus ecosystem designed to streamline society discovery, dual-track recruitment, and digital event ticketing. By combining Maximum Likelihood Estimation (MLE) persona matching, proctored Track A technical assessments (DSA, Web Dev, Cybersecurity), Track B portfolio media handling, real-time audition slot booking, and judge rubric UI with centralized event feeds, QR gate check-ins, and feedback pipelines, the platform replaces manual recruitment chaos with seamless, data-driven automation. Developed using modern agile practices, BCNF database modeling, and CI/CD automation, SocMag delivers high operational efficiency for students, recruiters, and event organizers alike.
+
+\end{document}
