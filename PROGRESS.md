@@ -1,5 +1,10 @@
 # Project Progress
 
+- [x] Restructure repo into `frontend/`, `backend/`, `mle-service/`, `db/` per CLAUDE.md.
+      Initialized git, moved the Next.js app into `frontend/` with `git mv` (history
+      preserved), added placeholder READMEs for `backend/`, `mle-service/`, `db/`
+      (no code yet — each is a separate future task), and updated `.gitignore` and
+      `.claude/launch.json` for the new paths. No application code was changed.
 - [x] Define project requirements and architecture.
 - [x] Set up Claude context files.
 - [x] Initialize Next.js project and install Tailwind/Lucide.
