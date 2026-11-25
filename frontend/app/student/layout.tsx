@@ -17,8 +17,9 @@ const NAV_ITEMS = [
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { currentUser, personaResult, ready } = useApp();
-  const [showQuiz, setShowQuiz] = useState(false);
   const [dismissedQuiz, setDismissedQuiz] = useState(false);
+  const showQuiz =
+    ready && currentUser?.role === "student" && !personaResult && !dismissedQuiz;
 
   useEffect(() => {
     if (!ready) return;
@@ -31,12 +32,6 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     }
   }, [ready, currentUser, router]);
 
-  useEffect(() => {
-    if (ready && currentUser?.role === "student" && !personaResult && !dismissedQuiz) {
-      setShowQuiz(true);
-    }
-  }, [ready, currentUser, personaResult, dismissedQuiz]);
-
   if (!ready || !currentUser || currentUser.role !== "student") {
     return <div className="flex flex-1 items-center justify-center text-sm text-muted">Loading…</div>;
   }
@@ -47,10 +42,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <BottomNav items={NAV_ITEMS} />
       {showQuiz && (
         <OnboardingQuiz
-          onClose={() => {
-            setShowQuiz(false);
-            setDismissedQuiz(true);
-          }}
+          onClose={() => setDismissedQuiz(true)}
         />
       )}
     </div>

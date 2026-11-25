@@ -75,6 +75,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PersistedState;
+        // localStorage doesn't exist during SSR, so it can only be read after
+        // mount; this one-time setState swaps the SSR'd default state for the
+        // persisted one and is the documented exception to this rule.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setState(parsed);
       }
     } catch {

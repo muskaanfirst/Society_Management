@@ -1,5 +1,14 @@
 # Project Progress
 
+- [x] Fix two pre-existing `react-hooks/set-state-in-effect` lint errors found after the
+      restructure. In `lib/store.tsx`, the one-time localStorage hydration on mount is a
+      documented exception (localStorage isn't available during SSR), so it's marked with
+      a targeted `eslint-disable-next-line` and a comment explaining why. In
+      `app/student/layout.tsx`, `showQuiz` was redundant state kept in sync via an effect;
+      it's now computed directly from `ready`/`currentUser`/`personaResult`/`dismissedQuiz`
+      during render, removing the effect entirely. Verified `npm run lint`, `tsc --noEmit`,
+      and `next build` all pass clean, and manually re-tested the onboarding quiz
+      (shows on first student login, dismiss keeps it closed) in the browser.
 - [x] Restructure repo into `frontend/`, `backend/`, `mle-service/`, `db/` per CLAUDE.md.
       Initialized git, moved the Next.js app into `frontend/` with `git mv` (history
       preserved), added placeholder READMEs for `backend/`, `mle-service/`, `db/`
