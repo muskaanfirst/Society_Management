@@ -1,5 +1,81 @@
 # Project Progress
 
+- [x] Build `frontend/lib/db.ts` (lazy-initialized `pg.Pool`, singleton across
+      Next.js dev hot-reloads, SSL on for Neon/Supabase) and 8 Next.js App
+      Router API routes under `frontend/app/api/`, all using parameterized
+      SQL (`$1`, `$2`, ...), matching the user's requested endpoint list:
+      - `POST /api/auth/login` -- validates `@thapar.edu` format, looks up
+        `users` by email, `bcrypt.compare`s the password, returns
+        `{ user, role }` (password_hash stripped) or 401/400.
+      - `GET /api/societies`, `PATCH /api/societies/[id]` -- the PATCH
+        requires a `requestingUserId` in the body matching that society's
+        `manager_id` (403 otherwise); there's no session/auth layer yet
+        (the login screen is still frontend-mock), so this is a deliberate,
+        documented stand-in, not real auth.
+      - `POST /api/calculate-compatibility` -- upserts the student's
+        `feature_vector` into a new `student_profiles` table, calls
+        `MLE_SERVICE_URL/mle-engine` (default `http://localhost:8000`) once
+        per society, upserts each result into a new `compatibility_scores`
+        table, returns all 8 scores sorted descending.
+      - `GET /api/slots`, `POST /api/slots/book` -- booking runs inside a
+        transaction with `UPDATE ... WHERE application_id IS NULL RETURNING
+        *`; 0 rows updated means the slot was already taken, which returns
+        409 instead of silently double-booking.
+      - `POST /api/test-submit` -- auto-grades against a new hardcoded
+        8-question bank (`frontend/lib/mcqBank.ts`, no question bank existed
+        anywhere in the repo before this), saves the score plus
+        `tab_switch_count` / `focus_loss_duration` / raw `answers`, marks the
+        application `Assessed`.
+      - `POST /api/applications/portfolio` -- saves a Track B portfolio URL
+        (rejects non-URLs with 400).
+      - `GET /api/grades` (`?type=TECH|NON_TECH`), `POST /api/grades` (body
+        `action`: `shortlist` | `rubric` | `bulkShortlistGreen`) -- tech
+        shortlisting by score, non-tech RED/YELLOW/GREEN rubric grading plus
+        bulk-shortlist-the-greens.
+      - `GET /api/events`, `POST /api/events/register` -- register is
+        idempotent (`ON CONFLICT DO NOTHING`, returns `alreadyRegistered:
+        true` on a repeat instead of erroring).
+
+      SCHEMA CHANGES: mapping these routes onto `db/schema.sql` surfaced 3
+      real gaps, added via `db/migrations/001_api_support.sql` (and mirrored
+      into `db/schema.sql` for fresh setups): `test_submissions` gained
+      `tab_switch_count`, `focus_loss_duration`, and `answers` (none of this
+      existed before); `applications` gained `portfolio_url` (distinct from
+      `form_answers`, which is the recruitment form's own questions); and
+      two new tables, `student_profiles` and `compatibility_scores`, since
+      nothing previously persisted a student's quiz vector or the MLE
+      service's output.
+
+      Installed `pg` + `bcryptjs` (+ their `@types/*`) into `frontend/`.
+
+      VERIFIED for real: ran `db/migrations/001_api_support.sql` against the
+      actual live cloud Postgres database (confirmed via
+      `information_schema` that all 3 new columns and both new tables exist
+      post-migration). Started `npm --prefix frontend run dev` and
+      `uvicorn main:app --port 8000` (from `mle-service/.venv`) for real,
+      then ran a from-scratch verification script
+      (`frontend/scripts/verify-api.mjs`, plain `fetch`, no new deps)
+      exercising all 8 routes against real seed data end-to-end: login
+      (valid + wrong-password), societies GET + PATCH (as the real manager,
+      and 403 as a non-manager), calculate-compatibility (8 scores back,
+      sorted descending), grades GET for both tracks, test-submit (partial
+      score computed correctly from a real question set), portfolio save
+      (valid + 400 on a bad URL), grades POST for all 3 actions, slots GET
+      + book (confirmed a second booking attempt on the same slot got a
+      real 409, not just assumed), and events GET + register (confirmed the
+      second registration attempt returned `alreadyRegistered: true`
+      instead of erroring). Actual output: **20 passed, 0 failed** -- see
+      the printed PASS lines above this summary in the session transcript;
+      no numbers here are invented. `npx tsc --noEmit`, `npm run lint`, and
+      `npm run build` all pass clean (the build initially failed because
+      `lib/db.ts` connected to Postgres eagerly at module-import time, which
+      broke Next's route-config collection step with no `DATABASE_URL`
+      present; fixed by only creating the real `pg.Pool` on first actual
+      `query`/`connect` call). Both servers were stopped after verification.
+
+      NOTE: `frontend/.env.local` (gitignored) must contain `DATABASE_URL`
+      and `MLE_SERVICE_URL` for any of this to run -- see "How to run and
+      test" below.
 - [x] Build `mle-service/main.py` (FastAPI) with `POST /mle-engine`.
       Models a society's `ideal_persona` as the mean of an 8-dimensional
       Gaussian (diagonal covariance, sigma=0.25 by default, overridable per
@@ -64,6 +140,17 @@
 - [x] Build Manager Layout with Bottom Nav.
 - [x] Implement Manager Tabs (My Society, Feed, Grading, Profile).
 - [x] Polish UI (Dark mode, padding, mobile responsiveness).
+
+## How to run and test the API routes
+1. Make sure `frontend/.env.local` exists with:
+   ```
+   DATABASE_URL=<your Neon/Supabase connection string>
+   MLE_SERVICE_URL=http://localhost:8000
+   ```
+2. In one terminal: `mle-service/.venv/Scripts/activate` then `uvicorn main:app --port 8000` (from inside `mle-service/`).
+3. In another terminal: `npm --prefix frontend run dev` (serves on `http://localhost:3000`).
+4. In a third terminal: `node frontend/scripts/verify-api.mjs` -- hits all 8 routes with real seed data and prints PASS/FAIL per check.
+   If you've already run it once, some checks (slot booking, event registration) will show different results on a second run since they mutate real data -- that's expected, not a bug.
 
 ## Notes
 - Verified end-to-end in-browser: login (email + bypasses), onboarding quiz + persona match,

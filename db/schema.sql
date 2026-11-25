@@ -78,6 +78,9 @@ CREATE TABLE applications (
   -- NON_TECH applications only: an array of {"question": ..., "answer": ...}
   -- objects from the recruitment form. NULL for TECH applications.
   form_answers  JSONB,
+  -- NON_TECH applications only: a link to a portfolio/work sample. Distinct from
+  -- form_answers (the recruitment form's own questions).
+  portfolio_url TEXT,
   submitted_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (student_id, society_id)
 );
@@ -91,10 +94,15 @@ CREATE INDEX idx_applications_society_id ON applications(society_id);
 -- No row = the student hasn't taken the assessment yet.
 -- ============================================================================
 CREATE TABLE test_submissions (
-  id             BIGSERIAL PRIMARY KEY,
-  application_id BIGINT NOT NULL UNIQUE REFERENCES applications(id) ON DELETE CASCADE,
-  score          INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
-  submitted_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+  id                   BIGSERIAL PRIMARY KEY,
+  application_id       BIGINT NOT NULL UNIQUE REFERENCES applications(id) ON DELETE CASCADE,
+  score                INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
+  -- Proctoring signals captured during the assessment.
+  tab_switch_count     INTEGER NOT NULL DEFAULT 0,
+  focus_loss_duration  INTEGER NOT NULL DEFAULT 0, -- seconds
+  -- Raw submitted MCQ answers, e.g. [{"questionId": "q1", "selectedIndex": 2}, ...].
+  answers              JSONB,
+  submitted_at         TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- ============================================================================
@@ -163,3 +171,28 @@ CREATE TABLE event_registrations (
 );
 
 CREATE INDEX idx_event_registrations_student_id ON event_registrations(student_id);
+
+-- ============================================================================
+-- student_profiles
+-- A student's onboarding-quiz interest-weight vector (same 8 keys as
+-- societies.ideal_persona). One row per student; retaking the quiz overwrites it.
+-- ============================================================================
+CREATE TABLE student_profiles (
+  student_id     TEXT PRIMARY KEY REFERENCES users(id),
+  feature_vector JSONB NOT NULL,
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ============================================================================
+-- compatibility_scores
+-- Cached MLE-service output (compatibility_score, mahalanobis_distance) per
+-- (student, society) pair, so it doesn't need recomputing on every page load.
+-- ============================================================================
+CREATE TABLE compatibility_scores (
+  student_id           TEXT NOT NULL REFERENCES users(id),
+  society_id           TEXT NOT NULL REFERENCES societies(id),
+  compatibility_score  NUMERIC NOT NULL,
+  mahalanobis_distance NUMERIC NOT NULL,
+  computed_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (student_id, society_id)
+);
