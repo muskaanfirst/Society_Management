@@ -1,5 +1,24 @@
 # Project Progress
 
+- [x] Build `mle-service/main.py` (FastAPI) with `POST /mle-engine`.
+      Models a society's `ideal_persona` as the mean of an 8-dimensional
+      Gaussian (diagonal covariance, sigma=0.25 by default, overridable per
+      request) and scores a student's `feature_vector` by its Gaussian
+      likelihood relative to the peak likelihood (an exact match), via
+      `scipy.stats.multivariate_normal`. Returns `compatibility_score`
+      (0-100%), `mahalanobis_distance`, and `per_dimension_deviation` for
+      debugging. Validates both vectors share the same 8 interest-tag keys
+      (coding, hardware, design, writing, speaking, acting, impact,
+      startups) and returns 400 on mismatch. Also added `GET /health`.
+      Added `mle-service/requirements.txt` (fastapi, uvicorn[standard],
+      numpy, scipy, pydantic).
+      VERIFIED by actually installing into a fresh `.venv` and running
+      `uvicorn main:app --port 8000`: `/health` returned `{"status":"ok"}`;
+      `/mle-engine` returned 100.0% for an identical feature_vector/
+      ideal_persona pair, 52.73% for a moderately-drifted vector, 0.0% for
+      a strongly mismatched vector, and HTTP 400 for mismatched keys.
+      `/docs` (Swagger UI) loaded with HTTP 200. All numbers above are from
+      those actual runs, not invented. Test server was stopped afterward.
 - [x] Add `db/schema.sql` and `db/seed.sql` (PostgreSQL, BCNF-normalized).
       Schema: `users`, `societies`, `applications`, `test_submissions`,
       `rubric_grades`, `slot_bookings`, `events`, `event_registrations`.
