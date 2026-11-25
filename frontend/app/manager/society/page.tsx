@@ -1,30 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CalendarClock, Lock, MapPin, Settings2, Users2 } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { DynamicIcon } from "@/components/DynamicIcon";
-import { AVAILABLE_INTERVIEW_SLOTS } from "@/lib/slots";
-import { societies } from "@/lib/mockData";
+import { apiFetch, formatTime } from "@/lib/api";
 import { useApp } from "@/lib/store";
+import type { InterviewSlot, NonTechGradeRow, Society, TechGradeRow } from "@/lib/types";
 
 export default function MySocietyPage() {
-  const { currentUser, applications, interviewSlots } = useApp();
-  const [openSlots, setOpenSlots] = useState<Record<number, boolean>>({});
+  const { currentUser } = useApp();
+  const [societies, setSocieties] = useState<Society[] | null>(null);
+  const [myApplicationIds, setMyApplicationIds] = useState<Set<number>>(new Set());
+  const [applicantCount, setApplicantCount] = useState(0);
+  const [shortlistedCount, setShortlistedCount] = useState(0);
+  const [slots, setSlots] = useState<InterviewSlot[]>([]);
 
-  const mySociety = societies.find((s) => s.id === currentUser?.societyId);
-  const others = societies.filter((s) => s.id !== currentUser?.societyId);
+  useEffect(() => {
+    if (!currentUser) return;
+    (async () => {
+      const { societies: allSocieties } = await apiFetch<{ societies: Society[] }>("/api/societies");
+      setSocieties(allSocieties);
+      const mySociety = allSocieties.find((s) => s.managerId === currentUser.id);
+      if (!mySociety) return;
 
-  const mySocietyApps = mySociety
-    ? applications.filter((a) => a.societyId === mySociety.id)
-    : [];
-  const mySocietySlots = mySociety
-    ? interviewSlots.filter((s) => s.societyId === mySociety.id)
-    : [];
+      const { rows } = mySociety.type === "TECH"
+        ? await apiFetch<{ rows: TechGradeRow[] }>("/api/grades?type=TECH")
+        : await apiFetch<{ rows: NonTechGradeRow[] }>("/api/grades?type=NON_TECH");
+      const mine = rows.filter((r) => r.societyId === mySociety.id);
+      setApplicantCount(mine.length);
+      setShortlistedCount(
+        mine.filter((r) => r.status === "Shortlisted" || r.status === "Interview_Booked").length
+      );
+      setMyApplicationIds(new Set(mine.map((r) => r.applicationId)));
 
-  const shortlistedCount = mySocietyApps.filter(
-    (a) => a.status === "Shortlisted" || a.status === "Interview_Booked"
-  ).length;
+      const { slots: allSlots } = await apiFetch<{ slots: InterviewSlot[] }>("/api/slots");
+      setSlots(allSlots);
+    })();
+  }, [currentUser]);
+
+  if (!currentUser || !societies) {
+    return (
+      <div>
+        <TopBar title="My Society" />
+        <p className="mt-8 text-center text-sm text-muted">Loading…</p>
+      </div>
+    );
+  }
+
+  const mySociety = societies.find((s) => s.managerId === currentUser.id);
+  const others = societies.filter((s) => s.id !== mySociety?.id);
 
   return (
     <div>
@@ -50,7 +75,7 @@ export default function MySocietyPage() {
 
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-2xl bg-white py-2.5 shadow-sm">
-                    <p className="text-lg font-extrabold text-navy">{mySocietyApps.length}</p>
+                    <p className="text-lg font-extrabold text-navy">{applicantCount}</p>
                     <p className="text-[10px] font-semibold text-muted">Applicants</p>
                   </div>
                   <div className="rounded-2xl bg-white py-2.5 shadow-sm">
@@ -58,7 +83,9 @@ export default function MySocietyPage() {
                     <p className="text-[10px] font-semibold text-muted">Shortlisted</p>
                   </div>
                   <div className="rounded-2xl bg-white py-2.5 shadow-sm">
-                    <p className="text-lg font-extrabold text-navy">{mySocietySlots.length}</p>
+                    <p className="text-lg font-extrabold text-navy">
+                      {slots.filter((s) => s.applicationId !== null && myApplicationIds.has(s.applicationId)).length}
+                    </p>
                     <p className="text-[10px] font-semibold text-muted">Interviews Booked</p>
                   </div>
                 </div>
@@ -67,17 +94,15 @@ export default function MySocietyPage() {
 
             <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
               <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted">
-                <Settings2 className="h-3.5 w-3.5" /> Interview slot management
+                <Settings2 className="h-3.5 w-3.5" /> Interview slots
               </p>
               <div className="flex flex-col gap-2">
-                {AVAILABLE_INTERVIEW_SLOTS.map((slot, i) => {
-                  const bookedBy = mySocietySlots.find(
-                    (s) => s.date === slot.date && s.time === slot.time
-                  );
-                  const closed = openSlots[i] === false;
+                {slots.map((slot) => {
+                  const bookedByMe =
+                    slot.applicationId !== null && myApplicationIds.has(slot.applicationId);
                   return (
                     <div
-                      key={i}
+                      key={slot.id}
                       className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface-2 px-3 py-2.5"
                     >
                       <div>
@@ -87,29 +112,20 @@ export default function MySocietyPage() {
                             month: "short",
                             day: "numeric",
                           })}{" "}
-                          · {slot.time}
+                          · {formatTime(slot.time)}
                         </p>
                         <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted">
                           <MapPin className="h-3 w-3" /> {slot.venue}
                         </p>
                       </div>
-                      {bookedBy ? (
+                      {slot.status === "booked" ? (
                         <span className="rounded-full bg-success-soft px-2 py-1 text-[10px] font-bold text-success">
-                          Booked
+                          {bookedByMe ? "Booked (yours)" : "Booked"}
                         </span>
                       ) : (
-                        <button
-                          onClick={() =>
-                            setOpenSlots((s) => ({ ...s, [i]: closed ? true : false }))
-                          }
-                          className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-bold transition"
-                          style={{
-                            backgroundColor: closed ? "var(--surface-2)" : "var(--accent-soft)",
-                            color: closed ? "var(--muted)" : "var(--accent-text)",
-                          }}
-                        >
-                          {closed ? "Closed" : "Open"}
-                        </button>
+                        <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-muted">
+                          Available
+                        </span>
                       )}
                     </div>
                   );

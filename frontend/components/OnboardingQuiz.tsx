@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { Modal } from "./Modal";
 import { useApp } from "@/lib/store";
+import { apiFetch } from "@/lib/api";
 import type { PersonaResult } from "@/lib/types";
 
 const INTERESTS = [
@@ -26,70 +27,84 @@ const SKILLS = [
   "Visual Design",
 ];
 
-const ARCHETYPES: Record<
-  string,
-  { name: string; description: string; societyIds: string[] }
-> = {
+const ARCHETYPES: Record<string, { name: string; description: string }> = {
   builder: {
     name: "The Builder",
     description:
       "You think in systems and love shipping things that work. You'd thrive in a hands-on technical team.",
-    societyIds: ["soc-codecell", "soc-robotics", "soc-designwing"],
   },
   storyteller: {
     name: "The Storyteller",
     description:
       "You communicate ideas that move people — through words, voice, or the stage.",
-    societyIds: ["soc-litsoc", "soc-dramatics"],
   },
   changemaker: {
     name: "The Changemaker",
     description:
       "You're driven by impact and enjoy turning ideas into ventures that help people.",
-    societyIds: ["soc-enactus"],
   },
   creative: {
     name: "The Creative",
     description:
       "You bring visual and expressive flair to everything you touch, from pixels to performance.",
-    societyIds: ["soc-designwing", "soc-dramatics"],
   },
 };
 
+interface CompatibilityScore {
+  societyId: string;
+  compatibilityScore: number;
+}
+
 export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
-  const { saveQuizResult } = useApp();
+  const { currentUser, savePersonaResult } = useApp();
   const [step, setStep] = useState(0);
   const [interests, setInterests] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [result, setResult] = useState<PersonaResult | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   function toggle(list: string[], setList: (v: string[]) => void, value: string) {
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
   }
 
-  function computeResult() {
-    const tagCounts: Record<string, number> = {};
-    for (const id of interests) {
-      const tag = INTERESTS.find((i) => i.id === id)?.tag;
-      if (tag) tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+  async function computeResult() {
+    if (!currentUser) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const featureVector = Object.fromEntries(
+        INTERESTS.map((i) => [i.id, interests.includes(i.id) ? 0.85 : 0.15])
+      );
+      const { scores } = await apiFetch<{ scores: CompatibilityScore[] }>(
+        "/api/calculate-compatibility",
+        { method: "POST", body: { studentId: currentUser.id, featureVector } }
+      );
+
+      const tagCounts: Record<string, number> = {};
+      for (const id of interests) {
+        const tag = INTERESTS.find((i) => i.id === id)?.tag;
+        if (tag) tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+      }
+      const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "builder";
+      const archetype = ARCHETYPES[topTag];
+      const matchScore = Math.min(98, 60 + interests.length * 4 + skills.length * 3);
+
+      const finalResult: PersonaResult = {
+        archetype: archetype.name,
+        description: archetype.description,
+        topSkills: skills.slice(0, 4),
+        matchScore,
+        recommendedSocietyIds: scores.slice(0, 3).map((s) => s.societyId),
+      };
+      setResult(finalResult);
+      savePersonaResult(finalResult);
+      setStep(2);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to compute your match. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-    const topTag =
-      Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "builder";
-    const archetype = ARCHETYPES[topTag];
-    const matchScore = Math.min(
-      98,
-      60 + interests.length * 4 + skills.length * 3
-    );
-    const finalResult: PersonaResult = {
-      archetype: archetype.name,
-      description: archetype.description,
-      topSkills: skills.slice(0, 4),
-      matchScore,
-      recommendedSocietyIds: archetype.societyIds,
-    };
-    setResult(finalResult);
-    saveQuizResult(finalResult);
-    setStep(2);
   }
 
   return (
@@ -153,12 +168,19 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
               );
             })}
           </div>
+          {error && <p className="mt-3 text-xs font-semibold text-danger">{error}</p>}
           <button
-            disabled={skills.length === 0}
+            disabled={skills.length === 0 || submitting}
             onClick={computeResult}
-            className="mt-5 w-full rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition disabled:opacity-40"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition disabled:opacity-40"
           >
-            See my persona match
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Computing…
+              </>
+            ) : (
+              "See my persona match"
+            )}
           </button>
         </div>
       )}

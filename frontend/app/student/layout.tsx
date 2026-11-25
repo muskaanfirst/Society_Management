@@ -18,8 +18,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const router = useRouter();
   const { currentUser, personaResult, ready } = useApp();
   const [dismissedQuiz, setDismissedQuiz] = useState(false);
-  const showQuiz =
-    ready && currentUser?.role === "student" && !personaResult && !dismissedQuiz;
+  const [showQuiz, setShowQuiz] = useState(false);
 
   useEffect(() => {
     if (!ready) return;
@@ -32,6 +31,21 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     }
   }, [ready, currentUser, router]);
 
+  useEffect(() => {
+    // Only decides whether to POP THE QUIZ OPEN for a student who hasn't
+    // taken it yet. Once open, it must stay open through its own "computing"
+    // and "result" steps even after personaResult gets saved mid-flow --
+    // deriving showQuiz straight from `!personaResult` would unmount the
+    // modal the instant the result lands, before the result screen ever paints.
+    if (ready && currentUser?.role === "student" && !personaResult && !dismissedQuiz) {
+      // One-time latch sync from async state (store hydration + the first
+      // render where personaResult is known), not a derived render value --
+      // same documented exception as the hydration effect in lib/store.tsx.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setShowQuiz(true);
+    }
+  }, [ready, currentUser, personaResult, dismissedQuiz]);
+
   if (!ready || !currentUser || currentUser.role !== "student") {
     return <div className="flex flex-1 items-center justify-center text-sm text-muted">Loading…</div>;
   }
@@ -42,7 +56,10 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
       <BottomNav items={NAV_ITEMS} />
       {showQuiz && (
         <OnboardingQuiz
-          onClose={() => setDismissedQuiz(true)}
+          onClose={() => {
+            setShowQuiz(false);
+            setDismissedQuiz(true);
+          }}
         />
       )}
     </div>

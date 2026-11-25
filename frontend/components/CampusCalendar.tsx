@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarClock, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { Modal } from "./Modal";
-import { events, societies } from "@/lib/mockData";
+import { apiFetch, formatTime } from "@/lib/api";
+import type { CampusEvent, Society } from "@/lib/types";
 
 function toISODate(y: number, m: number, d: number) {
   return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
@@ -12,17 +13,24 @@ function toISODate(y: number, m: number, d: number) {
 export function CampusCalendar() {
   const [cursor, setCursor] = useState(() => new Date(2026, 8, 1)); // Sept 2026 — seed data month
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [events, setEvents] = useState<CampusEvent[]>([]);
+  const [societies, setSocieties] = useState<Society[]>([]);
+
+  useEffect(() => {
+    apiFetch<{ events: CampusEvent[] }>("/api/events").then((r) => setEvents(r.events));
+    apiFetch<{ societies: Society[] }>("/api/societies").then((r) => setSocieties(r.societies));
+  }, []);
 
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
 
   const eventsByDate = useMemo(() => {
-    const map = new Map<string, typeof events>();
+    const map = new Map<string, CampusEvent[]>();
     for (const e of events) {
       map.set(e.date, [...(map.get(e.date) ?? []), e]);
     }
     return map;
-  }, []);
+  }, [events]);
 
   const firstWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -101,7 +109,7 @@ export function CampusCalendar() {
                   {society && <p className="text-xs font-semibold text-accent-text">{society.name}</p>}
                   <div className="mt-2 flex flex-col gap-1 text-xs text-muted">
                     <span className="flex items-center gap-1.5">
-                      <CalendarClock className="h-3.5 w-3.5" /> {e.time}
+                      <CalendarClock className="h-3.5 w-3.5" /> {formatTime(e.time)}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" /> {e.venue}

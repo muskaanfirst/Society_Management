@@ -1,4 +1,10 @@
-import { Pool } from "pg";
+import { Pool, types } from "pg";
+
+// Postgres DATE columns (event_date, slot_date) default-parse into JS Date
+// objects, which JSON.stringify as a full ISO timestamp and break the UI's
+// `new Date(dateString + "T00:00:00")` parsing. Keep them as plain
+// 'YYYY-MM-DD' strings instead -- OID 1082 is `date`.
+types.setTypeParser(1082, (val) => val);
 
 // Next.js dev hot-reload re-evaluates this module on every edit; without this
 // cache each reload would open a fresh Pool and leak connections. Production

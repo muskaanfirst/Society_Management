@@ -1,13 +1,12 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
   CalendarClock,
   CheckCircle2,
   ClipboardList,
-  Loader2,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -17,8 +16,9 @@ import { DynamicIcon } from "@/components/DynamicIcon";
 import { StatusBadge } from "@/components/StatusBadge";
 import { NonTechFormModal } from "@/components/NonTechFormModal";
 import { BookInterviewModal } from "@/components/BookInterviewModal";
-import { events, societies } from "@/lib/mockData";
+import { apiFetch, formatTime } from "@/lib/api";
 import { useApp } from "@/lib/store";
+import type { CampusEvent, InterviewSlot, MyApplication, Society } from "@/lib/types";
 
 export default function SocietyDetailPage({
   params,
@@ -26,11 +26,39 @@ export default function SocietyDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const society = societies.find((s) => s.id === id);
-  const { currentUser, applications, interviewSlots, submitTechAssessment } = useApp();
+  const { currentUser } = useApp();
+  const [society, setSociety] = useState<Society | null | undefined>(undefined);
+  const [myApp, setMyApp] = useState<MyApplication | null>(null);
+  const [mySlot, setMySlot] = useState<InterviewSlot | null>(null);
+  const [upcoming, setUpcoming] = useState<CampusEvent[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
-  const [assessing, setAssessing] = useState(false);
+
+  const refresh = useCallback(async () => {
+    if (!currentUser) return;
+    const [{ societies }, { applications }, { events }, { slots }] = await Promise.all([
+      apiFetch<{ societies: Society[] }>("/api/societies"),
+      apiFetch<{ applications: MyApplication[] }>(`/api/applications?studentId=${currentUser.id}`),
+      apiFetch<{ events: CampusEvent[] }>("/api/events"),
+      apiFetch<{ slots: InterviewSlot[] }>("/api/slots"),
+    ]);
+    setSociety(societies.find((s) => s.id === id) ?? null);
+    const app = applications.find((a) => a.societyId === id) ?? null;
+    setMyApp(app);
+    setMySlot(app ? slots.find((s) => s.applicationId === app.id) ?? null : null);
+    setUpcoming(events.filter((e) => e.societyId === id).slice(0, 2));
+  }, [currentUser, id]);
+
+  useEffect(() => {
+    // One-time data fetch on mount/change, not a render-phase setState -- the
+    // actual setState calls happen asynchronously after `refresh`'s awaits.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refresh();
+  }, [refresh]);
+
+  if (society === undefined) {
+    return <div className="p-6 text-sm text-muted">Loading…</div>;
+  }
 
   if (!society) {
     return (
@@ -38,22 +66,6 @@ export default function SocietyDetailPage({
         Society not found. <Link href="/student/societies" className="font-semibold text-accent-text">Go back</Link>
       </div>
     );
-  }
-
-  const myApp = applications.find(
-    (a) => a.studentId === currentUser?.id && a.societyId === society.id
-  );
-  const mySlot = myApp ? interviewSlots.find((s) => s.applicationId === myApp.id) : null;
-  const upcoming = events
-    .filter((e) => e.societyId === society.id)
-    .slice(0, 2);
-
-  function runAssessment() {
-    setAssessing(true);
-    setTimeout(() => {
-      submitTechAssessment(society!.id);
-      setAssessing(false);
-    }, 1400);
   }
 
   return (
@@ -111,7 +123,7 @@ export default function SocietyDetailPage({
                         month: "short",
                         day: "numeric",
                       })}{" "}
-                      · {e.time}
+                      · {formatTime(e.time)}
                     </span>
                     <span className="flex items-center gap-1">
                       <MapPin className="h-3 w-3" />
@@ -134,21 +146,12 @@ export default function SocietyDetailPage({
               <p className="mb-3 text-sm text-muted">
                 Complete a short proctored assessment to be considered for {society.name}.
               </p>
-              <button
-                onClick={runAssessment}
-                disabled={assessing}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition disabled:opacity-70"
+              <Link
+                href={`/student/societies/${society.id}/assessment`}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition"
               >
-                {assessing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Running assessment…
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="h-4 w-4" /> Take Proctored Assessment
-                  </>
-                )}
-              </button>
+                <ShieldCheck className="h-4 w-4" /> Take Proctored Assessment
+              </Link>
             </div>
           )}
 
@@ -175,14 +178,23 @@ export default function SocietyDetailPage({
                 )}
               </div>
 
-              {myApp.type === "TECH" && myApp.status === "Assessed" && (
+              {society.type === "TECH" && myApp.status === "Pending" && (
+                <Link
+                  href={`/student/societies/${society.id}/assessment`}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition"
+                >
+                  <ShieldCheck className="h-4 w-4" /> Resume Proctored Assessment
+                </Link>
+              )}
+
+              {society.type === "TECH" && myApp.status === "Assessed" && (
                 <p className="text-sm text-muted">
                   Your assessment has been scored. Shortlisting decisions are released shortly —
                   check back soon.
                 </p>
               )}
 
-              {myApp.status === "Pending" && (
+              {myApp.status === "Pending" && society.type === "NON_TECH" && (
                 <p className="text-sm text-muted">
                   Your application is under review by the {society.name} team.
                 </p>
@@ -213,7 +225,7 @@ export default function SocietyDetailPage({
                       month: "short",
                       day: "numeric",
                     })}{" "}
-                    · {mySlot.time}
+                    · {formatTime(mySlot.time)}
                   </p>
                   <p className="flex items-center gap-1 text-xs text-muted">
                     <MapPin className="h-3 w-3" /> {mySlot.venue}
@@ -230,14 +242,20 @@ export default function SocietyDetailPage({
           societyId={society.id}
           societyName={society.name}
           onClose={() => setShowForm(false)}
-          onSubmitted={() => setShowForm(false)}
+          onSubmitted={() => {
+            setShowForm(false);
+            void refresh();
+          }}
         />
       )}
       {showBooking && myApp && (
         <BookInterviewModal
           applicationId={myApp.id}
           onClose={() => setShowBooking(false)}
-          onBooked={() => setShowBooking(false)}
+          onBooked={() => {
+            setShowBooking(false);
+            void refresh();
+          }}
         />
       )}
     </div>

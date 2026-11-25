@@ -1,15 +1,25 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Mail, ShieldCheck } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { DynamicIcon } from "@/components/DynamicIcon";
-import { societies } from "@/lib/mockData";
+import { apiFetch } from "@/lib/api";
 import { useApp } from "@/lib/store";
+import type { Society } from "@/lib/types";
 
 export default function ManagerProfilePage() {
   const { currentUser } = useApp();
+  const [society, setSociety] = useState<Society | null>(null);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    apiFetch<{ societies: Society[] }>("/api/societies").then((r) =>
+      setSociety(r.societies.find((s) => s.managerId === currentUser.id) ?? null)
+    );
+  }, [currentUser]);
+
   if (!currentUser) return null;
-  const society = societies.find((s) => s.id === currentUser.societyId);
 
   return (
     <div>

@@ -1,17 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Mail, RefreshCcw, Sparkles, Hash } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { OnboardingQuiz } from "@/components/OnboardingQuiz";
 import { DynamicIcon } from "@/components/DynamicIcon";
-import { societies } from "@/lib/mockData";
+import { apiFetch } from "@/lib/api";
 import { useApp } from "@/lib/store";
+import type { Society } from "@/lib/types";
 
 export default function ProfilePage() {
   const { currentUser, personaResult } = useApp();
   const [showQuiz, setShowQuiz] = useState(false);
+  const [societies, setSocieties] = useState<Society[]>([]);
+
+  useEffect(() => {
+    apiFetch<{ societies: Society[] }>("/api/societies").then((r) => setSocieties(r.societies));
+  }, []);
 
   if (!currentUser) return null;
 

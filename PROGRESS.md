@@ -1,5 +1,118 @@
 # Project Progress
 
+- [x] Wire the entire frontend to the real API routes and build a real Track A
+      anti-cheat assessment flow -- every page under `frontend/app/` and most
+      of `frontend/components/` previously read `frontend/lib/mockData.ts`
+      (fake societies, fake in-memory applications) and mutated state purely
+      client-side; none of the 8 API routes built earlier were called
+      anywhere. `frontend/lib/mockData.ts` and `frontend/lib/slots.ts` are
+      now deleted (confirmed nothing imports them before deleting).
+
+      THREE NEW BACKEND PIECES (needed before the frontend could work at all,
+      not optional -- discovered while mapping real flows onto the existing
+      8 routes):
+      - `frontend/app/api/applications/route.ts` (new): `GET ?studentId=`
+        (a student's own applications, LEFT JOINed to `test_submissions` for
+        score) and `POST` (creates the initial `Pending` application row --
+        an upsert that never resets an already-Assessed/Shortlisted status
+        or blanks out a saved form/portfolio value on a repeat call).
+      - `frontend/app/api/test-questions/route.ts` (new): serves `MCQ_BANK`
+        with `correctIndex` stripped -- the client never receives the answer
+        key, since the assessment page is a real client component now.
+      - `frontend/lib/db.ts`: added `types.setTypeParser(1082, v => v)` --
+        `pg` default-parses Postgres `DATE` columns into JS `Date` objects,
+        which serialize as a full ISO timestamp and broke the UI's
+        `new Date(dateString + "T00:00:00")` parsing pattern. Found and
+        fixed by actually hitting this in the browser (events/slots showed
+        garbled dates before the fix).
+
+      FRONTEND REWIRE:
+      - `frontend/lib/types.ts` rewritten to match the real API response
+        shapes (numeric ids for applications/slots/events now that they're
+        real `BIGSERIAL` rows, `TechGradeRow`/`NonTechGradeRow` replacing the
+        old flat `Application`, etc).
+      - `frontend/lib/api.ts` (new): a small `apiFetch` wrapper (JSON +
+        error handling) and a `formatTime` helper (`"17:00:00"` -> `"5:00
+        PM"`), used by every page below instead of repeating fetch
+        boilerplate.
+      - `frontend/lib/store.tsx` shrunk to auth/session only (`currentUser`,
+        `personaResult`, `login`, `logout`, `savePersonaResult`) -- every
+        former in-memory mutation (`submitTechAssessment`,
+        `submitNonTechForm`, `bookInterview`, `gradeApplication`,
+        `shortlistApplication`, `bulkShortlistGreens`) is now a real
+        `apiFetch` call made directly from the page/component that needs it.
+      - Login (`frontend/app/login/page.tsx`): added a real password field
+        (the backend now checks one) calling `POST /api/auth/login`; the two
+        mock bypass buttons became three real demo-account shortcuts
+        (Student / Tech Manager / Non-Tech Manager) that log in for real
+        using the seeded accounts and the documented shared demo password.
+      - Every student page (societies list/detail, slots, profile,
+        `OnboardingQuiz`, `NonTechFormModal`, `BookInterviewModal`) and
+        manager page (My Society, Grading, Profile, `AnswersModal`) now
+        fetches/mutates through the real routes instead of `mockData`.
+        `OnboardingQuiz` still computes its "archetype" label client-side for
+        flavor, but now calls `POST /api/calculate-compatibility` for the
+        actual recommended-society list (real MLE-service scores). A
+        manager's own society is now derived via
+        `societies.find(s => s.managerId === currentUser.id)` instead of a
+        `user.societyId` field that doesn't exist in the real schema. The
+        My Society page's non-functional local-state "Open/Closed" slot
+        toggle (never did anything real) was removed in favor of showing
+        each slot's actual Available/Booked status.
+      - `NonTechFormModal`'s fake file-picker became a real "Portfolio URL"
+        text field (there's no file-upload backend; `applications.portfolio_url`
+        is a URL column, not a filename).
+      - **New Track A assessment page**:
+        `frontend/app/student/societies/[id]/assessment/page.tsx`. There was
+        no real MCQ-answering UI anywhere before this (the old "Take
+        Proctored Assessment" button was a `setTimeout` + random score
+        stub) -- this is a real question-answering UI built from scratch,
+        fetching real questions from `/api/test-questions` and submitting to
+        `/api/test-submit`. Real anti-cheat tracking: a
+        `document.visibilitychange` listener increments a live
+        `tabSwitchCount` and shows a dismissing warning banner every time the
+        tab is switched away from; a `window.blur`/`focus` pair accumulates
+        `focusLossDuration` in whole seconds. Both counts are submitted with
+        the assessment and stored in `test_submissions`.
+
+      BUG FOUND AND FIXED while browser-testing (pre-existing, exposed now
+      that the onboarding quiz does a real network round-trip instead of
+      finishing synchronously): `frontend/app/student/layout.tsx` derived
+      `showQuiz` directly from `!personaResult`, which unmounted the
+      `OnboardingQuiz` modal the instant `savePersonaResult` ran -- before
+      its own "result" screen (archetype + recommended societies) ever
+      painted. Fixed by making `showQuiz` a one-time latch (opens once when
+      a student has no persona result yet, stays open regardless of
+      `personaResult` changes mid-flow, closes only on the modal's own
+      explicit `onClose`) -- same documented
+      one-time-effect-setState exception already used in `lib/store.tsx`'s
+      hydration effect.
+
+      VERIFIED for real in the browser (both servers actually running):
+      logged in via all 3 demo shortcuts; retook the onboarding quiz and
+      confirmed the result screen now stays open and shows real
+      MLE-computed recommendations (The Storyteller / 67%, The Builder /
+      71% on an earlier run, with MARS/OWASP/CCS as real top-3 societies);
+      opened the real Track A assessment page for CCS and confirmed real
+      questions load from `/api/test-questions`; confirmed the anti-cheat
+      counters are wired correctly by dispatching real
+      `visibilitychange`/`blur`/`focus` DOM events (the embedded browser
+      pane's own tab-switching doesn't toggle `document.hidden`, so this was
+      the reliable way to prove the listeners fire) -- saw the warning
+      banner appear and "1 switches" / "6s away" update live; submitted the
+      assessment and confirmed the society page flipped to "Assessed" with
+      a real computed score (13/100); logged in as the Tech Manager and
+      confirmed the Grading page's real `/api/grades?type=TECH` data
+      included that exact submission, shortlisted it, and saw the status
+      update live; confirmed the Non-Tech grading view and `AnswersModal`
+      show real form answers and a real portfolio URL (one planted by the
+      earlier backend `verify-api.mjs` run, proving persistence end to end);
+      confirmed the My Society page shows correct derived-manager data (CCS,
+      4 applicants, 3 shortlisted, 1 interview) and real per-slot
+      Available/Booked status including "Booked (yours)" for the slot
+      booked during backend verification. `npx tsc --noEmit`, `npm run
+      lint`, and `npm run build` all pass clean. Both servers were stopped
+      after verification.
 - [x] Build `frontend/lib/db.ts` (lazy-initialized `pg.Pool`, singleton across
       Next.js dev hot-reloads, SSL on for Neon/Supabase) and 8 Next.js App
       Router API routes under `frontend/app/api/`, all using parameterized

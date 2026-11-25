@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Eye, Sparkles } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { AnswersModal } from "@/components/AnswersModal";
-import { societies } from "@/lib/mockData";
+import { apiFetch } from "@/lib/api";
 import { useApp } from "@/lib/store";
-import type { Application, Grade } from "@/lib/types";
+import type { Grade, NonTechGradeRow, Society, TechGradeRow } from "@/lib/types";
 
 const GRADE_STYLES: Record<Exclude<Grade, null>, { bg: string; fg: string }> = {
   RED: { bg: "var(--danger-soft)", fg: "var(--danger)" },
@@ -15,30 +15,57 @@ const GRADE_STYLES: Record<Exclude<Grade, null>, { bg: string; fg: string }> = {
 };
 
 export default function GradingPage() {
-  const { applications, shortlistApplication, gradeApplication, bulkShortlistGreens } = useApp();
+  const { currentUser } = useApp();
   const [view, setView] = useState<"TECH" | "NON_TECH">("TECH");
-  const [viewing, setViewing] = useState<Application | null>(null);
+  const [societies, setSocieties] = useState<Society[]>([]);
+  const [techRows, setTechRows] = useState<TechGradeRow[]>([]);
+  const [nonTechRows, setNonTechRows] = useState<NonTechGradeRow[]>([]);
+  const [viewing, setViewing] = useState<NonTechGradeRow | null>(null);
 
-  const techApps = useMemo(
-    () =>
-      applications
-        .filter((a) => a.type === "TECH")
-        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0)),
-    [applications]
-  );
+  const refresh = useCallback(async () => {
+    const [{ societies: s }, { rows: tech }, { rows: nonTech }] = await Promise.all([
+      apiFetch<{ societies: Society[] }>("/api/societies"),
+      apiFetch<{ rows: TechGradeRow[] }>("/api/grades?type=TECH"),
+      apiFetch<{ rows: NonTechGradeRow[] }>("/api/grades?type=NON_TECH"),
+    ]);
+    setSocieties(s);
+    setTechRows(tech.sort((a, b) => (b.score ?? 0) - (a.score ?? 0)));
+    setNonTechRows(nonTech);
+  }, []);
 
-  const nonTechApps = useMemo(
-    () => applications.filter((a) => a.type === "NON_TECH"),
-    [applications]
-  );
+  useEffect(() => {
+    // One-time data fetch on mount/change, not a render-phase setState -- the
+    // actual setState calls happen asynchronously after `refresh`'s awaits.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refresh();
+  }, [refresh]);
 
   const nonTechSocietyIds = useMemo(
-    () => Array.from(new Set(nonTechApps.map((a) => a.societyId))),
-    [nonTechApps]
+    () => Array.from(new Set(nonTechRows.map((r) => r.societyId))),
+    [nonTechRows]
   );
 
   function societyName(id: string) {
     return societies.find((s) => s.id === id)?.name ?? id;
+  }
+
+  async function shortlist(applicationId: number) {
+    await apiFetch("/api/grades", { method: "POST", body: { action: "shortlist", applicationId } });
+    void refresh();
+  }
+
+  async function setGrade(applicationId: number, grade: Exclude<Grade, null>) {
+    if (!currentUser) return;
+    await apiFetch("/api/grades", {
+      method: "POST",
+      body: { action: "rubric", applicationId, grade, gradedBy: currentUser.id },
+    });
+    void refresh();
+  }
+
+  async function bulkShortlistGreens(societyId: string) {
+    await apiFetch("/api/grades", { method: "POST", body: { action: "bulkShortlistGreen", societyId } });
+    void refresh();
   }
 
   return (
@@ -74,18 +101,18 @@ export default function GradingPage() {
                 </tr>
               </thead>
               <tbody>
-                {techApps.map((app) => {
+                {techRows.map((row) => {
                   const isShortlisted =
-                    app.status === "Shortlisted" || app.status === "Interview_Booked";
+                    row.status === "Shortlisted" || row.status === "Interview_Booked";
                   return (
-                    <tr key={app.id} className="border-t border-slate-100">
+                    <tr key={row.applicationId} className="border-t border-slate-100">
                       <td className="px-3 py-2.5">
-                        <p className="font-semibold text-navy">{app.studentName}</p>
-                        <p className="text-[10px] text-muted">{app.studentRollNo}</p>
+                        <p className="font-semibold text-navy">{row.studentName}</p>
+                        <p className="text-[10px] text-muted">{row.studentRollNo}</p>
                       </td>
-                      <td className="px-3 py-2.5 text-muted">{societyName(app.societyId)}</td>
-                      <td className="px-3 py-2.5 font-bold text-navy">{app.score}</td>
-                      <td className="px-3 py-2.5 text-muted">{app.status.replace("_", " ")}</td>
+                      <td className="px-3 py-2.5 text-muted">{societyName(row.societyId)}</td>
+                      <td className="px-3 py-2.5 font-bold text-navy">{row.score ?? "—"}</td>
+                      <td className="px-3 py-2.5 text-muted">{row.status.replace("_", " ")}</td>
                       <td className="px-3 py-2.5">
                         {isShortlisted ? (
                           <span className="flex items-center gap-1 font-semibold text-success">
@@ -93,7 +120,7 @@ export default function GradingPage() {
                           </span>
                         ) : (
                           <button
-                            onClick={() => shortlistApplication(app.id)}
+                            onClick={() => shortlist(row.applicationId)}
                             className="rounded-full bg-navy px-2.5 py-1.5 text-[11px] font-bold text-white"
                           >
                             Shortlist
@@ -131,16 +158,16 @@ export default function GradingPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {nonTechApps.map((app) => (
-                    <tr key={app.id} className="border-t border-slate-100">
+                  {nonTechRows.map((row) => (
+                    <tr key={row.applicationId} className="border-t border-slate-100">
                       <td className="px-3 py-2.5">
-                        <p className="font-semibold text-navy">{app.studentName}</p>
-                        <p className="text-[10px] text-muted">{app.studentRollNo}</p>
+                        <p className="font-semibold text-navy">{row.studentName}</p>
+                        <p className="text-[10px] text-muted">{row.studentRollNo}</p>
                       </td>
-                      <td className="px-3 py-2.5 text-muted">{societyName(app.societyId)}</td>
+                      <td className="px-3 py-2.5 text-muted">{societyName(row.societyId)}</td>
                       <td className="px-3 py-2.5">
                         <button
-                          onClick={() => setViewing(app)}
+                          onClick={() => setViewing(row)}
                           className="flex items-center gap-1 font-semibold text-accent-text transition hover:brightness-90"
                         >
                           <Eye className="h-3.5 w-3.5" /> View
@@ -149,11 +176,11 @@ export default function GradingPage() {
                       <td className="px-3 py-2.5">
                         <div className="flex gap-1">
                           {(["RED", "YELLOW", "GREEN"] as const).map((g) => {
-                            const active = app.grade === g;
+                            const active = row.grade === g;
                             return (
                               <button
                                 key={g}
-                                onClick={() => gradeApplication(app.id, g)}
+                                onClick={() => setGrade(row.applicationId, g)}
                                 className="h-5 w-5 rounded-full border-2 transition"
                                 style={{
                                   backgroundColor: active ? GRADE_STYLES[g].fg : "transparent",
@@ -165,7 +192,7 @@ export default function GradingPage() {
                           })}
                         </div>
                       </td>
-                      <td className="px-3 py-2.5 text-muted">{app.status.replace("_", " ")}</td>
+                      <td className="px-3 py-2.5 text-muted">{row.status.replace("_", " ")}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -175,7 +202,7 @@ export default function GradingPage() {
         )}
       </div>
 
-      {viewing && <AnswersModal application={viewing} onClose={() => setViewing(null)} />}
+      {viewing && <AnswersModal row={viewing} onClose={() => setViewing(null)} />}
     </div>
   );
 }
