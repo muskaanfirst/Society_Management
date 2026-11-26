@@ -63,12 +63,12 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-pastel-sage opacity-50 blur-3xl" />
       <div className="relative w-full max-w-sm animate-fade-in">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-navy shadow-md">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#B91C1C] shadow-md">
             <Users className="h-7 w-7 text-white" strokeWidth={2} />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-navy">SocMag</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-navy">Thapar Society Nexus</h1>
           <p className="mt-1.5 text-sm text-muted">
-            Your gateway to every society on campus.
+            Sign in to your campus societies portal.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function LoginPage() {
             <div className="my-6 flex items-center gap-3">
               <div className="h-px flex-1 bg-border" />
               <span className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-                Lab demo shortcuts
+                Quick Sign-In
               </span>
               <div className="h-px flex-1 bg-border" />
             </div>
@@ -148,7 +148,7 @@ export default function LoginPage() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <ShieldCheck className="h-4 w-4 text-navy" />
                 </span>
-                <span className="text-[11px] font-bold text-foreground">Tech Manager</span>
+                <span className="text-[11px] font-bold text-foreground">Technical Society Head</span>
               </button>
               <button
                 onClick={() => doLogin(DEMO_ACCOUNTS.nonTechManager, DEMO_PASSWORD)}
@@ -158,14 +158,14 @@ export default function LoginPage() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <Palette className="h-4 w-4 text-navy" />
                 </span>
-                <span className="text-[11px] font-bold text-foreground">Non-Tech Mgr</span>
+                <span className="text-[11px] font-bold text-foreground">Non-Technical Society Head</span>
               </button>
             </div>
           </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted">
-          Prototype build — connects to a real database, demo accounts only.
+          Thapar Institute of Engineering &amp; Technology, Patiala.
         </p>
       </div>
     </div>

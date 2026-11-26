@@ -64,6 +64,7 @@
 
 html {
   color-scheme: light;
+  scroll-behavior: smooth; /* for the landing page's #home/#about/#features anchor nav */
 }
 
 body {

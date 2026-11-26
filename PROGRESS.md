@@ -1,5 +1,51 @@
 # Project Progress
 
+- [x] Public landing page at `/` + professional login copy at `/login`.
+      `app/page.tsx` was previously just `redirect("/login")` -- `/login`
+      already lived at the right path, so no file "move" was actually
+      needed; the real work was building real landing-page content and
+      cleaning up the login screen's copy. Only `app/page.tsx`,
+      `app/login/page.tsx`, and one global `scroll-behavior: smooth` CSS
+      rule (for the navbar's anchor links) were touched -- no API route,
+      `lib/store.tsx`, DB query, or auth logic changed, confirmed by diff.
+
+      **Landing page** (plain Server Component, no client JS needed):
+      sticky navbar with a real file-existence check (`fs.existsSync` for
+      `public/tiet-logo.png`, server-side since this is a Server Component)
+      falling back to a crimson "TI" badge since that file doesn't exist
+      yet -- will start using a real logo automatically the moment one is
+      added, no code change needed. Full-width hero (`next/image` `fill` +
+      `priority` over `public/thapar-campus.jpg`, `bg-black/45` overlay,
+      serif "Thapar Society Nexus" / "Seamlessly Connected." + a "Get
+      Started" CTA). About section with the exact overview copy given.
+      Features section: 6 cards exactly as specified (crimson-tinted icon
+      square, green "Active" pill, title + 2-line description, full-width
+      slate `#64748B`/`#475569` hover "Learn More" button), using
+      Technical/Non-Technical wording throughout, no "Track A/B" jargon.
+      Minimal footer. Every "Learn More" (6/6) and the navbar "Login"
+      button verified in the browser to link to `/login`.
+
+      **Login page**: removed all prototype/lab-demo copy ("Lab Demo
+      Shortcuts", "Prototype build -- connects to a real database, demo
+      accounts only."). One flagged judgment call: renamed the wordmark
+      from "SocMag" to "Thapar Society Nexus" to match the new landing
+      page's branding -- having two different product names back-to-back
+      in the same login flow would have undercut the "looks official" goal
+      of this task. Quick sign-in buttons relabeled "Student" / "Technical
+      Society Head" / "Non-Technical Society Head" per the request, same
+      underlying `doLogin(...)` calls and accounts, completely untouched.
+
+      VERIFIED for real: `npx tsc --noEmit`, `npm run lint`, and `npm run
+      build` all pass with zero errors (`/` now prerenders as static
+      content). Live browser pass: confirmed the hero image actually
+      renders behind the dark overlay (looked flat gray at a glance in a
+      small screenshot -- zoomed in and confirmed real campus-building
+      photo content, not a rendering bug); confirmed all 6 feature cards,
+      the About section, and the footer render correctly; confirmed all 6
+      "Learn More" links plus the navbar Login button point to `/login`;
+      confirmed the polished login page shows no prototype copy and that
+      the "Student" quick sign-in button still logs in for real (landed on
+      `/student/societies`), proving the login logic itself was untouched.
 - [x] 3-tier automated test suite, built and run to 100% green for real.
 
       **The one real design problem**: Tiers 2 and 3 hit the live API routes
