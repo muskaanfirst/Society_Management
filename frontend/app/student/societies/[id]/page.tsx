@@ -82,7 +82,7 @@ export default function SocietyDetailPage({
       </div>
 
       <div className="px-4 py-5">
-        <div className={`overflow-hidden rounded-3xl shadow-sm ${pastelBgFor(society.id)}`}>
+        <div className={`overflow-hidden rounded-3xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${pastelBgFor(society.id)}`}>
           <div className="p-5">
             <div className="flex items-start gap-3.5">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
@@ -114,7 +114,7 @@ export default function SocietyDetailPage({
             </p>
             <div className="flex flex-col gap-2">
               {upcoming.map((e) => (
-                <div key={e.id} className="rounded-2xl border border-black/5 bg-white p-3">
+                <div key={e.id} className="rounded-2xl border border-black/5 bg-white p-3 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
                   <p className="text-sm font-bold text-navy">{e.title}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
                     <span className="flex items-center gap-1">
@@ -148,7 +148,7 @@ export default function SocietyDetailPage({
               </p>
               <Link
                 href={`/student/societies/${society.id}/assessment`}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
               >
                 <ShieldCheck className="h-4 w-4" /> Take Proctored Assessment
               </Link>
@@ -162,7 +162,7 @@ export default function SocietyDetailPage({
               </p>
               <button
                 onClick={() => setShowForm(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
               >
                 <ClipboardList className="h-4 w-4" /> Fill Form &amp; Upload
               </button>
@@ -181,7 +181,7 @@ export default function SocietyDetailPage({
               {society.type === "TECH" && myApp.status === "Pending" && (
                 <Link
                   href={`/student/societies/${society.id}/assessment`}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
                 >
                   <ShieldCheck className="h-4 w-4" /> Resume Proctored Assessment
                 </Link>
@@ -207,7 +207,7 @@ export default function SocietyDetailPage({
                   </p>
                   <button
                     onClick={() => setShowBooking(true)}
-                    className="flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition active:scale-95"
                   >
                     <CalendarClock className="h-4 w-4" /> Book In-Person Interview
                   </button>

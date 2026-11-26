@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Loader2, ShieldAlert } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { useApp } from "@/lib/store";
+import { useToast } from "@/components/Toast";
 
 interface Question {
   id: string;
@@ -20,6 +21,7 @@ export default function AssessmentPage({
   const { id: societyId } = use(params);
   const router = useRouter();
   const { currentUser } = useApp();
+  const { showToast } = useToast();
 
   const [applicationId, setApplicationId] = useState<number | null>(null);
   const [questions, setQuestions] = useState<Question[] | null>(null);
@@ -114,6 +116,7 @@ export default function AssessmentPage({
           focusLossDuration,
         },
       });
+      showToast("Assessment submitted!");
       router.push(`/student/societies/${societyId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit assessment.");
@@ -157,7 +160,7 @@ export default function AssessmentPage({
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {questions.map((q, i) => (
-            <div key={q.id} className="rounded-3xl border border-black/5 bg-white p-4 shadow-sm">
+            <div key={q.id} className="rounded-3xl border border-black/5 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
               <p className="mb-3 text-sm font-bold text-navy">
                 {i + 1}. {q.question}
               </p>
@@ -168,7 +171,7 @@ export default function AssessmentPage({
                     <button
                       key={optIndex}
                       onClick={() => setAnswers((a) => ({ ...a, [q.id]: optIndex }))}
-                      className="flex items-center justify-between rounded-2xl border-2 px-3.5 py-2.5 text-left text-sm font-semibold transition"
+                      className="flex items-center justify-between rounded-2xl border-2 px-3.5 py-2.5 text-left text-sm font-semibold transition active:scale-[0.98]"
                       style={{
                         borderColor: active ? "var(--accent)" : "var(--border)",
                         backgroundColor: active ? "var(--accent-soft)" : "var(--surface-2)",
@@ -189,7 +192,7 @@ export default function AssessmentPage({
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition disabled:opacity-60"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition active:scale-95 disabled:opacity-60"
         >
           {submitting ? (
             <>

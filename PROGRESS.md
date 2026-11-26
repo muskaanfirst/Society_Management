@@ -1,5 +1,71 @@
 # Project Progress
 
+- [x] UI interactivity pass on top of the Pastel Bento-Grid design: filter
+      pills, date-strip filters, tactile micro-interactions, and toast
+      notifications -- React state + Tailwind transitions only, no new npm
+      packages. No API route, `lib/store.tsx` logic, or existing `fetch()`
+      call's behavior was modified (confirmed by diffing the changed-file
+      list against `app/api/`, `lib/store.tsx`, `lib/db.ts` before calling
+      this done).
+      Four pieces needed a judgment call since the ask didn't map onto an
+      existing element 1:1 (all flagged to the user up front in the plan):
+      - **"Top Matches" filter pill** (`student/societies/page.tsx`) filters
+        to `personaResult.recommendedSocietyIds` (already in `lib/store.tsx`
+        after the onboarding quiz runs) -- no new fetch, no store change.
+        Shows "Take the onboarding quiz..." instead of an empty grid when
+        `personaResult` is still null.
+      - **`CompatibilityRing.tsx`** (new): small SVG ring, no score
+        visualization existed anywhere before this. `stroke-dashoffset`
+        animates in via CSS transition on mount. Used in `OnboardingQuiz`'s
+        result step and the student Profile page's Persona Match card.
+        Deliberately NOT added to Societies list cards -- that would need a
+        fresh `/api/calculate-compatibility` call (which re-writes
+        `compatibility_scores` server-side) on every page load.
+      - **Events Feed date strip** (`CampusCalendar.tsx`): added a "This
+        week" 7-day pill strip + a new flat, filterable event list below the
+        existing month grid (kept as-is). Each list row (and the day-detail
+        modal) got a "Register" button wired to the already-built, already-
+        tested `POST /api/events/register` -- the only genuinely new
+        frontend->backend call added in this task, since nothing in the UI
+        called that endpoint before.
+      - **Track B audition-slot date strip**: same 7-day-pill pattern
+        (computed from the dates actually present, never empty), filtering
+        the available-slot list in `BookInterviewModal.tsx` and the
+        Interview Slots section on `manager/society/page.tsx`.
+
+      `Toast.tsx` (new): a `ToastProvider`/`useToast()` context (plain React
+      state, no library), mounted once in `app/layout.tsx` inside
+      `AppProvider` so a toast fired right before a `router.push` still
+      shows on the next page. Dark rounded-full pill, bottom-center,
+      auto-dismiss after 3000ms. Wired at: login success, slot booked
+      (`BookInterviewModal`), assessment submitted, event registered
+      (`CampusCalendar`), and all three Grading actions (shortlist / rubric
+      grade / bulk-shortlist-greens).
+
+      Micro-interactions swept across every bento card (`transition-all
+      duration-200 hover:-translate-y-1 hover:shadow-lg`) and every button
+      (`active:scale-95` or the pre-existing equivalent) in: login, both
+      societies pages, the assessment page, My Slots, both profile pages,
+      My Society, Grading, and the onboarding quiz.
+
+      VERIFIED for real: `npx tsc --noEmit`, `npm run lint`, and `npm --
+      prefix frontend run build` all pass with zero errors. Live browser
+      pass with both servers running: confirmed the Top Matches pill's
+      empty-state and active black styling; completed the onboarding quiz
+      and watched the `CompatibilityRing` animate to 67% on both the quiz
+      result screen and the Profile page; filtered the Events Feed by a
+      specific day and registered for an event, confirming via DOM
+      inspection that the toast renders with the exact right text
+      ("Registered for MUDRA Open Dance Workshop!") and also caught it live
+      in a screenshot; filtered Track B slots by day in
+      `BookInterviewModal` and completed a real booking (status flipped to
+      "Interview Booked"); confirmed the Grading page's Shortlist/grade
+      actions still update the table correctly with the toast wiring in
+      place. (Two near-misses during testing were the screenshot tool
+      cropping tall viewports -- same quirk hit earlier with the bottom nav
+      -- not actual bugs: confirmed via `getBoundingClientRect()` that the
+      toast was rendering correctly just below the crop line.) Both servers
+      were stopped after verification.
 - [x] Visual-only "Pastel Bento-Grid" reskin of `frontend/` -- warm off-white
       canvas (#F7F7F5), white cards, five rotating pastel bento-accent colors
       (lavender/amber/sky/pink/sage), jet-black primary buttons and a solid

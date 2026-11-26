@@ -16,6 +16,7 @@ export default function MySocietyPage() {
   const [applicantCount, setApplicantCount] = useState(0);
   const [shortlistedCount, setShortlistedCount] = useState(0);
   const [slots, setSlots] = useState<InterviewSlot[]>([]);
+  const [slotDateFilter, setSlotDateFilter] = useState<string | "ALL">("ALL");
 
   useEffect(() => {
     if (!currentUser) return;
@@ -51,6 +52,8 @@ export default function MySocietyPage() {
 
   const mySociety = societies.find((s) => s.managerId === currentUser.id);
   const others = societies.filter((s) => s.id !== mySociety?.id);
+  const slotDates = Array.from(new Set(slots.map((s) => s.date))).sort();
+  const visibleSlots = slots.filter((s) => slotDateFilter === "ALL" || s.date === slotDateFilter);
 
   return (
     <div>
@@ -58,7 +61,7 @@ export default function MySocietyPage() {
       <div className="px-4 pt-4">
         {mySociety && (
           <>
-            <div className={`overflow-hidden rounded-3xl shadow-sm ${pastelBgFor(mySociety.id)}`}>
+            <div className={`overflow-hidden rounded-3xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${pastelBgFor(mySociety.id)}`}>
               <div className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
@@ -96,8 +99,42 @@ export default function MySocietyPage() {
               <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted">
                 <Settings2 className="h-3.5 w-3.5" /> Interview slots
               </p>
+
+              {slotDates.length > 1 && (
+                <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+                  <button
+                    onClick={() => setSlotDateFilter("ALL")}
+                    className="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition active:scale-95"
+                    style={{
+                      backgroundColor: slotDateFilter === "ALL" ? "var(--foreground)" : "var(--surface-2)",
+                      color: slotDateFilter === "ALL" ? "#ffffff" : "var(--muted)",
+                    }}
+                  >
+                    All Days
+                  </button>
+                  {slotDates.map((date) => {
+                    const d = new Date(date + "T00:00:00");
+                    const active = slotDateFilter === date;
+                    return (
+                      <button
+                        key={date}
+                        onClick={() => setSlotDateFilter(date)}
+                        className="flex shrink-0 flex-col items-center rounded-full px-3.5 py-1.5 text-xs font-bold transition active:scale-95"
+                        style={{
+                          backgroundColor: active ? "var(--foreground)" : "var(--surface-2)",
+                          color: active ? "#ffffff" : "var(--muted)",
+                        }}
+                      >
+                        <span>{d.toLocaleDateString("en-US", { weekday: "short" })}</span>
+                        <span>{d.getDate()}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {slots.map((slot) => {
+                {visibleSlots.map((slot) => {
                   const bookedByMe =
                     slot.applicationId !== null && myApplicationIds.has(slot.applicationId);
                   return (
@@ -142,7 +179,7 @@ export default function MySocietyPage() {
           {others.map((society) => (
             <div
               key={society.id}
-              className="flex items-center gap-3 rounded-2xl border border-black/5 bg-surface-2 p-3.5"
+              className="flex items-center gap-3 rounded-2xl border border-black/5 bg-surface-2 p-3.5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                 <DynamicIcon name={society.icon} className="h-5 w-5 text-muted" />

@@ -96,7 +96,7 @@ export function NonTechFormModal({
         <button
           disabled={!canSubmit || submitting}
           onClick={handleSubmit}
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition disabled:opacity-40"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition active:scale-95 disabled:opacity-40"
         >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit Application"}
         </button>

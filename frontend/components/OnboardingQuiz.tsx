@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { Modal } from "./Modal";
+import { CompatibilityRing } from "./CompatibilityRing";
 import { useApp } from "@/lib/store";
 import { apiFetch } from "@/lib/api";
 import type { PersonaResult } from "@/lib/types";
@@ -121,7 +122,7 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
                 <button
                   key={i.id}
                   onClick={() => toggle(interests, setInterests, i.id)}
-                  className="rounded-2xl border-2 px-3 py-2.5 text-left text-sm font-semibold transition"
+                  className="rounded-2xl border-2 px-3 py-2.5 text-left text-sm font-semibold transition active:scale-[0.98]"
                   style={{
                     borderColor: active ? "var(--accent)" : "var(--border)",
                     backgroundColor: active ? "var(--accent-soft)" : "var(--surface-2)",
@@ -136,7 +137,7 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
           <button
             disabled={interests.length === 0}
             onClick={() => setStep(1)}
-            className="mt-5 w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-40"
+            className="mt-5 w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:opacity-40"
           >
             Next
           </button>
@@ -155,7 +156,7 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
                 <button
                   key={s}
                   onClick={() => toggle(skills, setSkills, s)}
-                  className="flex items-center justify-between rounded-2xl border-2 px-3 py-2.5 text-left text-sm font-semibold transition"
+                  className="flex items-center justify-between rounded-2xl border-2 px-3 py-2.5 text-left text-sm font-semibold transition active:scale-[0.98]"
                   style={{
                     borderColor: active ? "var(--accent)" : "var(--border)",
                     backgroundColor: active ? "var(--accent-soft)" : "var(--surface-2)",
@@ -172,7 +173,7 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
           <button
             disabled={skills.length === 0 || submitting}
             onClick={computeResult}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-40"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:opacity-40"
           >
             {submitting ? (
               <>
@@ -195,13 +196,13 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
           </p>
           <h3 className="mt-1 text-xl font-extrabold text-navy">{result.archetype}</h3>
           <p className="mt-2 text-sm text-muted">{result.description}</p>
-          <div className="mt-4 rounded-3xl bg-pastel-lavender py-4">
-            <p className="text-4xl font-extrabold tracking-tight text-foreground">{result.matchScore}%</p>
+          <div className="mt-4 flex flex-col items-center gap-2 rounded-3xl bg-pastel-lavender py-4">
+            <CompatibilityRing score={result.matchScore} size={96} stroke={9} />
             <p className="text-xs font-semibold text-foreground/70">match confidence</p>
           </div>
           <button
             onClick={onClose}
-            className="mt-5 w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
+            className="mt-5 w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
           >
             Explore recommended societies
           </button>

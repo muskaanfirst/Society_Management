@@ -59,7 +59,7 @@ export default function SlotsPage() {
             </p>
             <Link
               href="/student/societies"
-              className="mt-4 rounded-full bg-foreground px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+              className="mt-4 rounded-full bg-foreground px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
             >
               Browse Societies
             </Link>
@@ -67,7 +67,7 @@ export default function SlotsPage() {
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {mySlots.map((slot) => (
-              <div key={slot.id} className={`overflow-hidden rounded-3xl shadow-sm ${pastelBgFor(slot.society.id)}`}>
+              <div key={slot.id} className={`overflow-hidden rounded-3xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${pastelBgFor(slot.society.id)}`}>
                 <div className="flex items-center gap-3 p-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                     <DynamicIcon name={slot.society.icon} className="h-5 w-5 text-navy" />

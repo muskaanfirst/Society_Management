@@ -6,6 +6,7 @@ import { Mail, RefreshCcw, Sparkles, Hash } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { OnboardingQuiz } from "@/components/OnboardingQuiz";
 import { DynamicIcon } from "@/components/DynamicIcon";
+import { CompatibilityRing } from "@/components/CompatibilityRing";
 import { apiFetch } from "@/lib/api";
 import { useApp } from "@/lib/store";
 import type { Society } from "@/lib/types";
@@ -25,7 +26,7 @@ export default function ProfilePage() {
     <div>
       <TopBar title="Profile" />
       <div className="px-4 pt-4">
-        <div className="flex flex-col items-center rounded-3xl border border-black/5 bg-white p-6 text-center shadow-sm">
+        <div className="flex flex-col items-center rounded-3xl border border-black/5 bg-white p-6 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-extrabold text-white">
             {currentUser.name
               .split(" ")
@@ -43,7 +44,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <div className="mt-5 overflow-hidden rounded-3xl bg-pastel-lavender shadow-sm">
+        <div className="mt-5 overflow-hidden rounded-3xl bg-pastel-lavender shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
           <div className="p-5">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-xs font-bold uppercase tracking-wide text-foreground/60">
@@ -51,7 +52,7 @@ export default function ProfilePage() {
               </p>
               <button
                 onClick={() => setShowQuiz(true)}
-                className="flex items-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-xs font-bold text-foreground"
+                className="flex items-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-xs font-bold text-foreground transition active:scale-95"
               >
                 <RefreshCcw className="h-3 w-3" /> Retake
               </button>
@@ -66,9 +67,7 @@ export default function ProfilePage() {
                     </div>
                     <p className="text-base font-extrabold text-foreground">{personaResult.archetype}</p>
                   </div>
-                  <p className="text-3xl font-extrabold tracking-tight text-foreground">
-                    {personaResult.matchScore}%
-                  </p>
+                  <CompatibilityRing score={personaResult.matchScore} size={64} stroke={6} />
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-foreground/80">
                   {personaResult.description}
@@ -98,7 +97,7 @@ export default function ProfilePage() {
                       <Link
                         key={id}
                         href={`/student/societies/${id}`}
-                        className="flex items-center gap-2.5 rounded-2xl bg-white px-3 py-2.5 shadow-sm transition hover:brightness-95"
+                        className="flex items-center gap-2.5 rounded-2xl bg-white px-3 py-2.5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:scale-[0.98]"
                       >
                         <DynamicIcon name={s.icon} className="h-4 w-4 text-navy" />
                         <span className="text-sm font-semibold text-navy">{s.name}</span>
@@ -110,7 +109,7 @@ export default function ProfilePage() {
             ) : (
               <button
                 onClick={() => setShowQuiz(true)}
-                className="w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
+                className="w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95"
               >
                 Take the Onboarding Quiz
               </button>

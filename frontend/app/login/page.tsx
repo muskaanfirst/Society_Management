@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GraduationCap, Mail, Lock, ShieldCheck, ArrowRight, Users, Palette } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { apiFetch, ApiError } from "@/lib/api";
+import { useToast } from "@/components/Toast";
 import type { User } from "@/lib/types";
 
 const DEMO_PASSWORD = "DemoPass#2026";
@@ -18,6 +19,7 @@ const DEMO_ACCOUNTS = {
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useApp();
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +36,7 @@ export default function LoginPage() {
         body: { email: loginEmail, password: loginPassword },
       });
       login(user);
+      showToast(`Welcome, ${user.name.split(" ")[0]}!`);
       router.push(user.role === "student" ? "/student" : "/manager");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
@@ -130,7 +133,7 @@ export default function LoginPage() {
               <button
                 onClick={() => doLogin(DEMO_ACCOUNTS.student, DEMO_PASSWORD)}
                 disabled={submitting}
-                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-sky px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
+                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-sky px-2 py-4 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:scale-95 disabled:opacity-60"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <GraduationCap className="h-4 w-4 text-navy" />
@@ -140,7 +143,7 @@ export default function LoginPage() {
               <button
                 onClick={() => doLogin(DEMO_ACCOUNTS.techManager, DEMO_PASSWORD)}
                 disabled={submitting}
-                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-amber px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
+                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-amber px-2 py-4 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:scale-95 disabled:opacity-60"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <ShieldCheck className="h-4 w-4 text-navy" />
@@ -150,7 +153,7 @@ export default function LoginPage() {
               <button
                 onClick={() => doLogin(DEMO_ACCOUNTS.nonTechManager, DEMO_PASSWORD)}
                 disabled={submitting}
-                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-pink px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
+                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-pink px-2 py-4 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:scale-95 disabled:opacity-60"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <Palette className="h-4 w-4 text-navy" />

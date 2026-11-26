@@ -6,6 +6,7 @@ import { TopBar } from "@/components/TopBar";
 import { AnswersModal } from "@/components/AnswersModal";
 import { apiFetch } from "@/lib/api";
 import { useApp } from "@/lib/store";
+import { useToast } from "@/components/Toast";
 import type { Grade, NonTechGradeRow, Society, TechGradeRow } from "@/lib/types";
 
 const GRADE_STYLES: Record<Exclude<Grade, null>, { bg: string; fg: string }> = {
@@ -16,6 +17,7 @@ const GRADE_STYLES: Record<Exclude<Grade, null>, { bg: string; fg: string }> = {
 
 export default function GradingPage() {
   const { currentUser } = useApp();
+  const { showToast } = useToast();
   const [view, setView] = useState<"TECH" | "NON_TECH">("TECH");
   const [societies, setSocieties] = useState<Society[]>([]);
   const [techRows, setTechRows] = useState<TechGradeRow[]>([]);
@@ -51,6 +53,7 @@ export default function GradingPage() {
 
   async function shortlist(applicationId: number) {
     await apiFetch("/api/grades", { method: "POST", body: { action: "shortlist", applicationId } });
+    showToast("Applicant shortlisted!");
     void refresh();
   }
 
@@ -60,11 +63,16 @@ export default function GradingPage() {
       method: "POST",
       body: { action: "rubric", applicationId, grade, gradedBy: currentUser.id },
     });
+    showToast("Grade saved!");
     void refresh();
   }
 
   async function bulkShortlistGreens(societyId: string) {
-    await apiFetch("/api/grades", { method: "POST", body: { action: "bulkShortlistGreen", societyId } });
+    const { shortlistedApplicationIds } = await apiFetch<{ shortlistedApplicationIds: number[] }>(
+      "/api/grades",
+      { method: "POST", body: { action: "bulkShortlistGreen", societyId } }
+    );
+    showToast(`Shortlisted ${shortlistedApplicationIds.length} applicant(s)!`);
     void refresh();
   }
 
@@ -77,7 +85,7 @@ export default function GradingPage() {
             <button
               key={v}
               onClick={() => setView(v)}
-              className="flex-1 rounded-full py-2.5 text-xs font-bold transition"
+              className="flex-1 rounded-full py-2.5 text-xs font-bold transition active:scale-95"
               style={{
                 backgroundColor: view === v ? "var(--foreground)" : "transparent",
                 color: view === v ? "#ffffff" : "var(--muted)",
@@ -121,7 +129,7 @@ export default function GradingPage() {
                         ) : (
                           <button
                             onClick={() => shortlist(row.applicationId)}
-                            className="rounded-full bg-navy px-2.5 py-1.5 text-[11px] font-bold text-white"
+                            className="rounded-full bg-navy px-2.5 py-1.5 text-[11px] font-bold text-white transition active:scale-95"
                           >
                             Shortlist
                           </button>
@@ -140,7 +148,7 @@ export default function GradingPage() {
                 <button
                   key={id}
                   onClick={() => bulkShortlistGreens(id)}
-                  className="flex items-center gap-1.5 rounded-full border border-success/30 bg-success-soft px-2.5 py-1.5 text-[11px] font-bold text-success"
+                  className="flex items-center gap-1.5 rounded-full border border-success/30 bg-success-soft px-2.5 py-1.5 text-[11px] font-bold text-success transition active:scale-95"
                 >
                   <Sparkles className="h-3 w-3" /> Shortlist Greens — {societyName(id)}
                 </button>
@@ -181,7 +189,7 @@ export default function GradingPage() {
                               <button
                                 key={g}
                                 onClick={() => setGrade(row.applicationId, g)}
-                                className="h-5 w-5 rounded-full border-2 transition"
+                                className="h-5 w-5 rounded-full border-2 transition active:scale-90"
                                 style={{
                                   backgroundColor: active ? GRADE_STYLES[g].fg : "transparent",
                                   borderColor: GRADE_STYLES[g].fg,
