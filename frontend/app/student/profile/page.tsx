@@ -25,7 +25,7 @@ export default function ProfilePage() {
     <div>
       <TopBar title="Profile" />
       <div className="px-4 pt-4">
-        <div className="flex flex-col items-center rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+        <div className="flex flex-col items-center rounded-3xl border border-black/5 bg-white p-6 text-center shadow-sm">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-extrabold text-white">
             {currentUser.name
               .split(" ")
@@ -43,16 +43,15 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <div className="mt-5 overflow-hidden rounded-3xl bg-slate-card shadow-sm">
-          <div className="h-1.5 w-full bg-accent" />
+        <div className="mt-5 overflow-hidden rounded-3xl bg-pastel-lavender shadow-sm">
           <div className="p-5">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wide text-white/70">
+              <p className="text-xs font-bold uppercase tracking-wide text-foreground/60">
                 Persona Match
               </p>
               <button
                 onClick={() => setShowQuiz(true)}
-                className="flex items-center gap-1 text-xs font-bold text-white"
+                className="flex items-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-xs font-bold text-foreground"
               >
                 <RefreshCcw className="h-3 w-3" /> Retake
               </button>
@@ -60,16 +59,18 @@ export default function ProfilePage() {
 
             {personaResult ? (
               <div>
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm">
-                    <Sparkles className="h-5 w-5 text-navy" />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm">
+                      <Sparkles className="h-5 w-5 text-navy" />
+                    </div>
+                    <p className="text-base font-extrabold text-foreground">{personaResult.archetype}</p>
                   </div>
-                  <div>
-                    <p className="text-base font-extrabold text-white">{personaResult.archetype}</p>
-                    <p className="text-xs text-white/70">{personaResult.matchScore}% match confidence</p>
-                  </div>
+                  <p className="text-3xl font-extrabold tracking-tight text-foreground">
+                    {personaResult.matchScore}%
+                  </p>
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-white/90">
+                <p className="mt-3 text-sm leading-relaxed text-foreground/80">
                   {personaResult.description}
                 </p>
 
@@ -78,7 +79,7 @@ export default function ProfilePage() {
                     {personaResult.topSkills.map((s) => (
                       <span
                         key={s}
-                        className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white"
+                        className="rounded-full bg-black/10 px-2.5 py-1 text-[11px] font-semibold text-foreground"
                       >
                         {s}
                       </span>
@@ -86,10 +87,10 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                <p className="mb-2 mt-4 text-xs font-bold uppercase tracking-wide text-white/70">
+                <p className="mb-2 mt-4 text-xs font-bold uppercase tracking-wide text-foreground/60">
                   Recommended for you
                 </p>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-2">
                   {personaResult.recommendedSocietyIds.map((id) => {
                     const s = societies.find((soc) => soc.id === id);
                     if (!s) return null;
@@ -109,7 +110,7 @@ export default function ProfilePage() {
             ) : (
               <button
                 onClick={() => setShowQuiz(true)}
-                className="w-full rounded-2xl bg-white py-3 text-sm font-bold text-navy"
+                className="w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
               >
                 Take the Onboarding Quiz
               </button>

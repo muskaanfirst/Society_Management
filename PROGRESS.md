@@ -1,5 +1,45 @@
 # Project Progress
 
+- [x] Visual-only "Pastel Bento-Grid" reskin of `frontend/` -- warm off-white
+      canvas (#F7F7F5), white cards, five rotating pastel bento-accent colors
+      (lavender/amber/sky/pink/sage), jet-black primary buttons and a solid
+      dark floating pill nav, generous rounded-full/rounded-3xl corners,
+      border-black/5 everywhere. No API route, `lib/store.tsx`, `fetch()`
+      call, form handler, or the Track A anti-cheat logic was touched --
+      confirmed by diffing the exact file list against the plan before
+      starting and spot-checking the assessment page's diff for zero logic
+      lines changed.
+      New: `frontend/components/pastelAccents.ts` (a tiny deterministic
+      id -> one-of-5-literal-Tailwind-class-strings hash, so every society
+      gets a consistent color everywhere it appears, written as literal
+      strings so Tailwind's scanner doesn't purge them from the production
+      build). Updated: `globals.css` + `tailwind.config.js` (new color
+      tokens), `BottomNav.tsx` (solid black capsule instead of a white bar
+      with a black active-item highlight), every page/component that had a
+      `bg-slate-card` dark hero card (recolored to a pastel with dark text),
+      a literal `bg-accent` primary button (recolored to jet-black), or
+      `border-slate-200` (recolored to `border-black/5`). Societies/My Slots
+      lists and the assessment question list become responsive
+      `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`-style bento grids on wider
+      screens instead of a fixed mobile-width single column; the student/
+      manager layout containers widen from `max-w-lg` to `max-w-lg
+      lg:max-w-5xl` to allow it. `StatusBadge`'s `Rejected` status moved
+      from red to the pastel-pink token (true login/validation errors stay
+      red). One scope call made and flagged to the user: kept a single
+      floating-bottom pill nav at every screen size rather than also adding
+      a separate desktop left-sidebar variant (would need real layout
+      restructuring for a purely cosmetic "optional" ask).
+      VERIFIED for real: `npx tsc --noEmit`, `npm run lint`, and `npm run
+      build` all pass with zero errors. Then a live browser pass with both
+      servers running: screenshotted Login, the Societies bento grid, a
+      Society detail hero card, the Track A assessment question grid, My
+      Society's stat tiles, and the Grading table at a 1440px desktop width
+      (confirmed multi-column bento layout, pastel per-society colors, big
+      bold stat numbers, solid black nav -- verified the nav's real
+      `background-color: rgb(17,17,17)` via computed styles since the
+      screenshot tool crops tall viewports) and again at a 375px mobile
+      width (confirmed everything collapses to a clean single column with
+      the same colors and the nav still floating correctly).
 - [x] Wire the entire frontend to the real API routes and build a real Track A
       anti-cheat assessment flow -- every page under `frontend/app/` and most
       of `frontend/components/` previously read `frontend/lib/mockData.ts`

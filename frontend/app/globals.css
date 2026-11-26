@@ -3,22 +3,28 @@
 @config "../tailwind.config.js";
 
 :root {
-  --background: #f8fafc;
+  --background: #f7f7f5;
   --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --border: #e2e8f0;
+  --surface-2: #f3f3f1;
+  --border: rgba(17, 17, 17, 0.08);
 
-  --foreground: #0f172a; /* navy-dark: headings, primary text, icons-in-badges */
-  --muted: #475569; /* soft slate gray: body / secondary text */
+  --foreground: #111111; /* jet black: headings, primary text, primary buttons */
+  --muted: #6b7280; /* muted gray: body / secondary text */
 
-  --slate-card: #8897ad; /* soft muted slate-blue: entity/feature card fills */
+  --slate-card: #c4b5fd; /* default bento fill when a per-id pastel isn't picked */
 
-  --accent: #f59e0b; /* warm golden yellow: buttons, top accent bars, highlights */
+  --pastel-lavender: #c4b5fd;
+  --pastel-amber: #fbbf24;
+  --pastel-sky: #93c5fd;
+  --pastel-pink: #f9a8d4;
+  --pastel-sage: #a7f3d0;
+
+  --accent: #fbbf24; /* warm amber: selection highlights, badges -- NOT primary buttons */
   --accent-soft: #fef3c7; /* pale yellow: badge / pill backgrounds */
   --accent-text: #b45309; /* deeper amber: readable standalone text/links */
 
   --success: #16a34a;
-  --success-soft: #dcfce7;
+  --success-soft: #d2f8e4;
 
   --danger: #ef4444;
   --danger-soft: #fee2e2;
@@ -35,6 +41,12 @@
   --color-muted: var(--muted);
 
   --color-slate-card: var(--slate-card);
+
+  --color-pastel-lavender: var(--pastel-lavender);
+  --color-pastel-amber: var(--pastel-amber);
+  --color-pastel-sky: var(--pastel-sky);
+  --color-pastel-pink: var(--pastel-pink);
+  --color-pastel-sage: var(--pastel-sage);
 
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);

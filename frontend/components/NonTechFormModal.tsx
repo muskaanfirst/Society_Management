@@ -62,7 +62,7 @@ export function NonTechFormModal({
             onChange={(e) => setWhy(e.target.value)}
             rows={3}
             placeholder="Tell us in a few sentences…"
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-surface-2 px-3 py-2.5 text-sm text-navy outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+            className="w-full resize-none rounded-2xl border border-black/5 bg-surface-2 px-3 py-2.5 text-sm text-navy outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
           />
         </div>
         <div>
@@ -74,7 +74,7 @@ export function NonTechFormModal({
             onChange={(e) => setExperience(e.target.value)}
             rows={3}
             placeholder="Past work, links, achievements…"
-            className="w-full resize-none rounded-2xl border border-slate-200 bg-surface-2 px-3 py-2.5 text-sm text-navy outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+            className="w-full resize-none rounded-2xl border border-black/5 bg-surface-2 px-3 py-2.5 text-sm text-navy outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
           />
         </div>
         <div>
@@ -88,7 +88,7 @@ export function NonTechFormModal({
               value={portfolioUrl}
               onChange={(e) => setPortfolioUrl(e.target.value)}
               placeholder="https://your-portfolio.example.com"
-              className="w-full rounded-2xl border border-slate-200 bg-surface-2 py-2.5 pl-10 pr-3 text-sm text-navy outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              className="w-full rounded-2xl border border-black/5 bg-surface-2 py-2.5 pl-10 pr-3 text-sm text-navy outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
           </div>
         </div>
@@ -96,7 +96,7 @@ export function NonTechFormModal({
         <button
           disabled={!canSubmit || submitting}
           onClick={handleSubmit}
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-2xl bg-navy py-3 text-sm font-bold text-white transition disabled:opacity-40"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition disabled:opacity-40"
         >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit Application"}
         </button>

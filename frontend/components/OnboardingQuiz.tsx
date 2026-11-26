@@ -136,7 +136,7 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
           <button
             disabled={interests.length === 0}
             onClick={() => setStep(1)}
-            className="mt-5 w-full rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition disabled:opacity-40"
+            className="mt-5 w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-40"
           >
             Next
           </button>
@@ -172,7 +172,7 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
           <button
             disabled={skills.length === 0 || submitting}
             onClick={computeResult}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition disabled:opacity-40"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-40"
           >
             {submitting ? (
               <>
@@ -187,7 +187,7 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
 
       {step === 2 && result && (
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-slate-100">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-black/5">
             <Sparkles className="h-8 w-8 text-navy" />
           </div>
           <p className="text-xs font-bold uppercase tracking-wide text-muted">
@@ -195,13 +195,13 @@ export function OnboardingQuiz({ onClose }: { onClose: () => void }) {
           </p>
           <h3 className="mt-1 text-xl font-extrabold text-navy">{result.archetype}</h3>
           <p className="mt-2 text-sm text-muted">{result.description}</p>
-          <div className="mt-4 rounded-2xl border border-slate-200 bg-surface-2 py-3">
-            <p className="text-2xl font-extrabold text-navy">{result.matchScore}%</p>
-            <p className="text-xs text-muted">match confidence</p>
+          <div className="mt-4 rounded-3xl bg-pastel-lavender py-4">
+            <p className="text-4xl font-extrabold tracking-tight text-foreground">{result.matchScore}%</p>
+            <p className="text-xs font-semibold text-foreground/70">match confidence</p>
           </div>
           <button
             onClick={onClose}
-            className="mt-5 w-full rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition"
+            className="mt-5 w-full rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
           >
             Explore recommended societies
           </button>

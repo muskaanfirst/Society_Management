@@ -72,12 +72,12 @@ export default function GradingPage() {
     <div>
       <TopBar title="Grading" />
       <div className="px-4 pt-4">
-        <div className="flex gap-2 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
+        <div className="flex gap-2 rounded-full border border-black/5 bg-white p-1.5 shadow-sm">
           {(["TECH", "NON_TECH"] as const).map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
-              className="flex-1 rounded-xl py-2.5 text-xs font-bold transition"
+              className="flex-1 rounded-full py-2.5 text-xs font-bold transition"
               style={{
                 backgroundColor: view === v ? "var(--foreground)" : "transparent",
                 color: view === v ? "#ffffff" : "var(--muted)",
@@ -89,7 +89,7 @@ export default function GradingPage() {
         </div>
 
         {view === "TECH" ? (
-          <div className="mt-4 overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="mt-4 overflow-x-auto rounded-3xl border border-black/5 bg-white shadow-sm">
             <table className="w-full min-w-[560px] border-collapse text-left text-xs">
               <thead>
                 <tr className="bg-surface-2 text-muted">
@@ -105,7 +105,7 @@ export default function GradingPage() {
                   const isShortlisted =
                     row.status === "Shortlisted" || row.status === "Interview_Booked";
                   return (
-                    <tr key={row.applicationId} className="border-t border-slate-100">
+                    <tr key={row.applicationId} className="border-t border-black/5">
                       <td className="px-3 py-2.5">
                         <p className="font-semibold text-navy">{row.studentName}</p>
                         <p className="text-[10px] text-muted">{row.studentRollNo}</p>
@@ -146,7 +146,7 @@ export default function GradingPage() {
                 </button>
               ))}
             </div>
-            <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-x-auto rounded-3xl border border-black/5 bg-white shadow-sm">
               <table className="w-full min-w-[620px] border-collapse text-left text-xs">
                 <thead>
                   <tr className="bg-surface-2 text-muted">
@@ -159,7 +159,7 @@ export default function GradingPage() {
                 </thead>
                 <tbody>
                   {nonTechRows.map((row) => (
-                    <tr key={row.applicationId} className="border-t border-slate-100">
+                    <tr key={row.applicationId} className="border-t border-black/5">
                       <td className="px-3 py-2.5">
                         <p className="font-semibold text-navy">{row.studentName}</p>
                         <p className="text-[10px] text-muted">{row.studentRollNo}</p>

@@ -42,7 +42,7 @@ export function CampusCalendar() {
   const selectedEvents = selectedDate ? eventsByDate.get(selectedDate) ?? [] : [];
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="rounded-3xl border border-black/5 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between px-1 pb-3">
         <button
           onClick={() => setCursor(new Date(year, month - 1, 1))}
@@ -104,7 +104,7 @@ export function CampusCalendar() {
             {selectedEvents.map((e) => {
               const society = societies.find((s) => s.id === e.societyId);
               return (
-                <div key={e.id} className="rounded-2xl border border-slate-200 bg-surface-2 p-3.5">
+                <div key={e.id} className="rounded-2xl border border-black/5 bg-surface-2 p-3.5">
                   <p className="text-sm font-bold text-navy">{e.title}</p>
                   {society && <p className="text-xs font-semibold text-accent-text">{society.name}</p>}
                   <div className="mt-2 flex flex-col gap-1 text-xs text-muted">

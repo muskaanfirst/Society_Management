@@ -9,8 +9,8 @@ export function TopBar({ title }: { title: string }) {
   const { currentUser, logout } = useApp();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3.5">
+    <header className="sticky top-0 z-30 border-b border-black/5 bg-background/90 backdrop-blur-md">
+      <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3.5 lg:max-w-5xl">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy shadow-sm">
             <Users className="h-4 w-4 text-white" />

@@ -34,7 +34,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="flex flex-1 flex-col">
-      <main className="mx-auto w-full max-w-lg flex-1 pb-28">{children}</main>
+      <main className="mx-auto w-full max-w-lg flex-1 pb-28 lg:max-w-5xl">{children}</main>
       <BottomNav items={NAV_ITEMS} />
     </div>
   );

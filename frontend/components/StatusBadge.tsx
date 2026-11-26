@@ -5,7 +5,7 @@ const STYLES: Record<ApplicationStatus, { bg: string; fg: string; label: string 
   Assessed: { bg: "var(--accent-soft)", fg: "var(--accent-text)", label: "Assessed" },
   Shortlisted: { bg: "var(--success-soft)", fg: "var(--success)", label: "Shortlisted" },
   Interview_Booked: { bg: "var(--success-soft)", fg: "var(--success)", label: "Interview Booked" },
-  Rejected: { bg: "var(--danger-soft)", fg: "var(--danger)", label: "Not Selected" },
+  Rejected: { bg: "var(--pastel-pink)", fg: "var(--foreground)", label: "Not Selected" },
 };
 
 export function StatusBadge({ status }: { status: ApplicationStatus }) {

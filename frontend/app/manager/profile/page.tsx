@@ -5,6 +5,7 @@ import { Mail, ShieldCheck } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { DynamicIcon } from "@/components/DynamicIcon";
 import { apiFetch } from "@/lib/api";
+import { pastelBgFor } from "@/components/pastelAccents";
 import { useApp } from "@/lib/store";
 import type { Society } from "@/lib/types";
 
@@ -25,7 +26,7 @@ export default function ManagerProfilePage() {
     <div>
       <TopBar title="Profile" />
       <div className="px-4 pt-4">
-        <div className="flex flex-col items-center rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+        <div className="flex flex-col items-center rounded-3xl border border-black/5 bg-white p-6 text-center shadow-sm">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-xl font-extrabold text-white">
             {currentUser.name
               .split(" ")
@@ -42,16 +43,15 @@ export default function ManagerProfilePage() {
         </div>
 
         {society && (
-          <div className="mt-5 overflow-hidden rounded-3xl bg-slate-card shadow-sm">
-            <div className="h-1.5 w-full bg-accent" />
+          <div className={`mt-5 overflow-hidden rounded-3xl shadow-sm ${pastelBgFor(society.id)}`}>
             <div className="flex items-center gap-3 p-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm">
                 <DynamicIcon name={society.icon} className="h-5 w-5 text-navy" />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-wide text-white/70">Managing</p>
-                <p className="text-sm font-bold text-white">{society.name}</p>
-                <p className="text-xs text-white/75">{society.tagline}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-foreground/60">Managing</p>
+                <p className="text-sm font-bold text-foreground">{society.name}</p>
+                <p className="text-xs text-foreground/70">{society.tagline}</p>
               </div>
             </div>
           </div>

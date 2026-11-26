@@ -140,7 +140,7 @@ export default function AssessmentPage({
         </div>
       )}
 
-      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-slate-200 bg-background/90 px-4 py-3.5 backdrop-blur-md">
+      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-black/5 bg-background/90 px-4 py-3.5 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <ArrowLeft className="h-4 w-4 text-muted" />
           <p className="text-sm font-bold text-navy">Proctored Assessment</p>
@@ -155,9 +155,9 @@ export default function AssessmentPage({
           {answeredCount} of {questions.length} answered
         </p>
 
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {questions.map((q, i) => (
-            <div key={q.id} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div key={q.id} className="rounded-3xl border border-black/5 bg-white p-4 shadow-sm">
               <p className="mb-3 text-sm font-bold text-navy">
                 {i + 1}. {q.question}
               </p>
@@ -189,7 +189,7 @@ export default function AssessmentPage({
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-navy py-3 text-sm font-bold text-white transition disabled:opacity-60"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition disabled:opacity-60"
         >
           {submitting ? (
             <>

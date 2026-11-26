@@ -17,6 +17,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { NonTechFormModal } from "@/components/NonTechFormModal";
 import { BookInterviewModal } from "@/components/BookInterviewModal";
 import { apiFetch, formatTime } from "@/lib/api";
+import { pastelBgFor } from "@/components/pastelAccents";
 import { useApp } from "@/lib/store";
 import type { CampusEvent, InterviewSlot, MyApplication, Society } from "@/lib/types";
 
@@ -70,7 +71,7 @@ export default function SocietyDetailPage({
 
   return (
     <div>
-      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 bg-background/90 px-4 py-3.5 backdrop-blur-md">
+      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-black/5 bg-background/90 px-4 py-3.5 backdrop-blur-md">
         <Link
           href="/student/societies"
           className="flex h-8 w-8 items-center justify-center rounded-full text-muted transition hover:bg-surface-2 hover:text-navy"
@@ -81,8 +82,7 @@ export default function SocietyDetailPage({
       </div>
 
       <div className="px-4 py-5">
-        <div className="overflow-hidden rounded-3xl bg-slate-card shadow-sm">
-          <div className="h-1.5 w-full bg-accent" />
+        <div className={`overflow-hidden rounded-3xl shadow-sm ${pastelBgFor(society.id)}`}>
           <div className="p-5">
             <div className="flex items-start gap-3.5">
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
@@ -90,20 +90,20 @@ export default function SocietyDetailPage({
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-lg font-extrabold text-white">{society.name}</h1>
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white">
+                  <h1 className="text-lg font-extrabold text-foreground">{society.name}</h1>
+                  <span className="rounded-full bg-black/10 px-2 py-0.5 text-[10px] font-bold text-foreground">
                     {society.type === "TECH" ? "Tech" : "Non-Tech"}
                   </span>
                 </div>
-                <p className="text-sm text-white/80">{society.tagline}</p>
-                <div className="mt-1.5 flex items-center gap-1 text-xs text-white/70">
+                <p className="text-sm text-foreground/70">{society.tagline}</p>
+                <div className="mt-1.5 flex items-center gap-1 text-xs text-foreground/60">
                   <Users2 className="h-3.5 w-3.5" />
                   {society.memberCount} members
                 </div>
               </div>
             </div>
 
-            <p className="mt-4 text-sm leading-relaxed text-white/90">{society.description}</p>
+            <p className="mt-4 text-sm leading-relaxed text-foreground/80">{society.description}</p>
           </div>
         </div>
 
@@ -114,7 +114,7 @@ export default function SocietyDetailPage({
             </p>
             <div className="flex flex-col gap-2">
               {upcoming.map((e) => (
-                <div key={e.id} className="rounded-2xl border border-slate-200 bg-white p-3">
+                <div key={e.id} className="rounded-2xl border border-black/5 bg-white p-3">
                   <p className="text-sm font-bold text-navy">{e.title}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
                     <span className="flex items-center gap-1">
@@ -136,7 +136,7 @@ export default function SocietyDetailPage({
           </div>
         )}
 
-        <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mt-6 rounded-3xl border border-black/5 bg-white p-4 shadow-sm">
           <p className="mb-3 text-xs font-bold uppercase tracking-wide text-muted">
             Application status
           </p>
@@ -148,7 +148,7 @@ export default function SocietyDetailPage({
               </p>
               <Link
                 href={`/student/societies/${society.id}/assessment`}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
               >
                 <ShieldCheck className="h-4 w-4" /> Take Proctored Assessment
               </Link>
@@ -162,7 +162,7 @@ export default function SocietyDetailPage({
               </p>
               <button
                 onClick={() => setShowForm(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
               >
                 <ClipboardList className="h-4 w-4" /> Fill Form &amp; Upload
               </button>
@@ -181,7 +181,7 @@ export default function SocietyDetailPage({
               {society.type === "TECH" && myApp.status === "Pending" && (
                 <Link
                   href={`/student/societies/${society.id}/assessment`}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90"
                 >
                   <ShieldCheck className="h-4 w-4" /> Resume Proctored Assessment
                 </Link>
@@ -207,7 +207,7 @@ export default function SocietyDetailPage({
                   </p>
                   <button
                     onClick={() => setShowBooking(true)}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-navy py-3 text-sm font-bold text-white transition"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-sm font-bold text-white transition"
                   >
                     <CalendarClock className="h-4 w-4" /> Book In-Person Interview
                   </button>

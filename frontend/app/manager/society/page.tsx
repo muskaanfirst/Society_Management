@@ -5,6 +5,7 @@ import { CalendarClock, Lock, MapPin, Settings2, Users2 } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { DynamicIcon } from "@/components/DynamicIcon";
 import { apiFetch, formatTime } from "@/lib/api";
+import { pastelBgFor } from "@/components/pastelAccents";
 import { useApp } from "@/lib/store";
 import type { InterviewSlot, NonTechGradeRow, Society, TechGradeRow } from "@/lib/types";
 
@@ -57,33 +58,32 @@ export default function MySocietyPage() {
       <div className="px-4 pt-4">
         {mySociety && (
           <>
-            <div className="overflow-hidden rounded-3xl bg-slate-card shadow-sm">
-              <div className="h-1.5 w-full bg-accent" />
+            <div className={`overflow-hidden rounded-3xl shadow-sm ${pastelBgFor(mySociety.id)}`}>
               <div className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
                     <DynamicIcon name={mySociety.icon} className="h-6 w-6 text-navy" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-white">{mySociety.name}</p>
-                    <p className="truncate text-xs text-white/75">{mySociety.tagline}</p>
+                    <p className="text-sm font-bold text-foreground">{mySociety.name}</p>
+                    <p className="truncate text-xs text-foreground/70">{mySociety.tagline}</p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-bold text-white">
+                  <span className="shrink-0 rounded-full bg-black/10 px-2.5 py-1 text-[10px] font-bold text-foreground">
                     You manage this
                   </span>
                 </div>
 
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-2xl bg-white py-2.5 shadow-sm">
-                    <p className="text-lg font-extrabold text-navy">{applicantCount}</p>
+                  <div className="rounded-2xl bg-white py-3 shadow-sm">
+                    <p className="text-2xl font-extrabold tracking-tight text-navy">{applicantCount}</p>
                     <p className="text-[10px] font-semibold text-muted">Applicants</p>
                   </div>
-                  <div className="rounded-2xl bg-white py-2.5 shadow-sm">
-                    <p className="text-lg font-extrabold text-success">{shortlistedCount}</p>
+                  <div className="rounded-2xl bg-white py-3 shadow-sm">
+                    <p className="text-2xl font-extrabold tracking-tight text-success">{shortlistedCount}</p>
                     <p className="text-[10px] font-semibold text-muted">Shortlisted</p>
                   </div>
-                  <div className="rounded-2xl bg-white py-2.5 shadow-sm">
-                    <p className="text-lg font-extrabold text-navy">
+                  <div className="rounded-2xl bg-white py-3 shadow-sm">
+                    <p className="text-2xl font-extrabold tracking-tight text-navy">
                       {slots.filter((s) => s.applicationId !== null && myApplicationIds.has(s.applicationId)).length}
                     </p>
                     <p className="text-[10px] font-semibold text-muted">Interviews Booked</p>
@@ -92,18 +92,18 @@ export default function MySocietyPage() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="mt-4 rounded-3xl border border-black/5 bg-white p-4 shadow-sm">
               <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted">
                 <Settings2 className="h-3.5 w-3.5" /> Interview slots
               </p>
-              <div className="flex flex-col gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {slots.map((slot) => {
                   const bookedByMe =
                     slot.applicationId !== null && myApplicationIds.has(slot.applicationId);
                   return (
                     <div
                       key={slot.id}
-                      className="flex items-center justify-between rounded-2xl border border-slate-200 bg-surface-2 px-3 py-2.5"
+                      className="flex items-center justify-between rounded-2xl border border-black/5 bg-surface-2 px-3 py-2.5"
                     >
                       <div>
                         <p className="flex items-center gap-1.5 text-xs font-semibold text-navy">
@@ -123,7 +123,7 @@ export default function MySocietyPage() {
                           {bookedByMe ? "Booked (yours)" : "Booked"}
                         </span>
                       ) : (
-                        <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-muted">
+                        <span className="rounded-full border border-black/5 bg-white px-2.5 py-1 text-[10px] font-bold text-muted">
                           Available
                         </span>
                       )}
@@ -138,11 +138,11 @@ export default function MySocietyPage() {
         <p className="mb-2 mt-6 text-xs font-bold uppercase tracking-wide text-muted">
           All societies
         </p>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {others.map((society) => (
             <div
               key={society.id}
-              className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-surface-2 p-3.5"
+              className="flex items-center gap-3 rounded-2xl border border-black/5 bg-surface-2 p-3.5"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                 <DynamicIcon name={society.icon} className="h-5 w-5 text-muted" />

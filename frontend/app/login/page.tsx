@@ -55,8 +55,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-sm animate-fade-in">
+    <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 py-12">
+      <div className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-pastel-lavender opacity-50 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-pastel-sage opacity-50 blur-3xl" />
+      <div className="relative w-full max-w-sm animate-fade-in">
         <div className="mb-8 flex flex-col items-center text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-navy shadow-md">
             <Users className="h-7 w-7 text-white" strokeWidth={2} />
@@ -67,7 +69,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
+        <div className="overflow-hidden rounded-3xl border border-black/5 bg-white shadow-xl shadow-black/5">
           <div className="h-1.5 w-full bg-accent" />
           <div className="p-6">
             <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-muted">
@@ -84,7 +86,7 @@ export default function LoginPage() {
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleContinue()}
                 placeholder="yourname@thapar.edu"
-                className="w-full rounded-2xl border border-slate-200 bg-surface-2 py-3 pl-10 pr-3 text-sm text-navy placeholder:text-muted/60 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/25"
+                className="w-full rounded-full border border-black/5 bg-surface-2 py-3 pl-10 pr-3 text-sm text-navy placeholder:text-muted/60 outline-none transition focus:border-foreground/20 focus:ring-2 focus:ring-foreground/10"
               />
             </div>
 
@@ -102,7 +104,7 @@ export default function LoginPage() {
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleContinue()}
                 placeholder="••••••••"
-                className="w-full rounded-2xl border border-slate-200 bg-surface-2 py-3 pl-10 pr-3 text-sm text-navy placeholder:text-muted/60 outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/25"
+                className="w-full rounded-full border border-black/5 bg-surface-2 py-3 pl-10 pr-3 text-sm text-navy placeholder:text-muted/60 outline-none transition focus:border-foreground/20 focus:ring-2 focus:ring-foreground/10"
               />
             </div>
             {error && <p className="mt-2 text-xs font-semibold text-danger">{error}</p>}
@@ -110,7 +112,7 @@ export default function LoginPage() {
             <button
               onClick={handleContinue}
               disabled={submitting}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-3 text-sm font-bold text-navy transition hover:brightness-95 active:scale-[0.98] disabled:opacity-60"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
             >
               Continue
               <ArrowRight className="h-4 w-4" />
@@ -128,32 +130,32 @@ export default function LoginPage() {
               <button
                 onClick={() => doLogin(DEMO_ACCOUNTS.student, DEMO_PASSWORD)}
                 disabled={submitting}
-                className="flex flex-col items-center gap-2 rounded-2xl bg-slate-card px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
+                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-sky px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <GraduationCap className="h-4 w-4 text-navy" />
                 </span>
-                <span className="text-[11px] font-bold text-white">Student</span>
+                <span className="text-[11px] font-bold text-foreground">Student</span>
               </button>
               <button
                 onClick={() => doLogin(DEMO_ACCOUNTS.techManager, DEMO_PASSWORD)}
                 disabled={submitting}
-                className="flex flex-col items-center gap-2 rounded-2xl bg-slate-card px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
+                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-amber px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <ShieldCheck className="h-4 w-4 text-navy" />
                 </span>
-                <span className="text-[11px] font-bold text-white">Tech Manager</span>
+                <span className="text-[11px] font-bold text-foreground">Tech Manager</span>
               </button>
               <button
                 onClick={() => doLogin(DEMO_ACCOUNTS.nonTechManager, DEMO_PASSWORD)}
                 disabled={submitting}
-                className="flex flex-col items-center gap-2 rounded-2xl bg-slate-card px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
+                className="flex flex-col items-center gap-2 rounded-3xl bg-pastel-pink px-2 py-4 text-center shadow-sm transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                   <Palette className="h-4 w-4 text-navy" />
                 </span>
-                <span className="text-[11px] font-bold text-white">Non-Tech Mgr</span>
+                <span className="text-[11px] font-bold text-foreground">Non-Tech Mgr</span>
               </button>
             </div>
           </div>
