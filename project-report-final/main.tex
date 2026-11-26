@@ -1,0 +1,353 @@
+\documentclass[12pt,a4paper]{report}
+
+% --- Core Packages ---
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+
+% --- Color Palette & Hyperlink Setup ---
+\definecolor{tietblue}{HTML}{1E3A5F}
+\definecolor{slateaccent}{HTML}{334155}
+\definecolor{mutedgray}{HTML}{4B5563}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=tietblue,
+    urlcolor=tietblue,
+    citecolor=tietblue,
+    pdftitle={Thapar Society Nexus - Final Project Report},
+    pdfauthor={Shivani Shrivastava (1024170278), Aishna Jindal (1024170247), Muskaan Singhal(1024170248)}
+}
+
+% --- Chapter & Header Formatting ---
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{tietblue}}{\chaptertitlename\ \thechapter}{10pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{18pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{mutedgray}Thapar Society Nexus (SocMag)}
+\fancyhead[R]{\small\color{mutedgray}TIET Patiala}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+% ==============================================================================
+% TITLE PAGE
+% ==============================================================================
+\begin{titlepage}
+    \centering
+    \vspace*{0.8cm}
+    {\Large \textbf{THAPAR INSTITUTE OF ENGINEERING \& TECHNOLOGY, PATIALA}}\\[0.3cm]
+    {\large (Deemed to be University)}\\[1.4cm]
+
+    \rule{\linewidth}{0.5mm}\\[0.5cm]
+    {\Huge \textbf{\color{tietblue}Thapar Society Nexus (SocMag)}}\\[0.35cm]
+    {\Large A Unified Digital Platform for Campus Society Discovery, Dual-Track Recruitment, and Event Management}\\[0.3cm]
+    \rule{\linewidth}{0.5mm}\\[1.6cm]
+
+    {\large \textbf{Final Project Report}}\\[0.35cm]
+    {\normalsize Submitted in partial fulfillment of the requirements for the degree of}\\[0.2cm]
+    {\normalsize \textbf{Bachelor of Engineering}}\\[1.8cm]
+
+    \begin{minipage}{0.48\textwidth}
+        \begin{flushleft}
+            \textbf{Submitted by:}\\
+            Shivani Shrivastava\\
+            Aishna Jindal\\
+            Muskaan Singhal
+        \end{flushleft}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \begin{flushright}
+            \textbf{Under the Guidance of:}\\
+            Dr. Raghav B. Venkataramaiyer\\
+            Faculty Advisor, TIET Patiala
+        \end{flushright}
+    \end{minipage}
+
+    \vfill
+    {\large November 2026}
+\end{titlepage}
+
+% ==============================================================================
+% ABSTRACT & FRONT MATTER
+% ==============================================================================
+\pagenumbering{roman}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Student societies and clubs play a central role in technical innovation, cultural expression, and leadership development at Thapar Institute of Engineering \& Technology (TIET). Despite this vibrant ecosystem, society discovery, recruitment drives, audition scheduling, and campus event registrations remain fragmented across disconnected online forms, static spreadsheets, and informal messaging channels. This fragmentation leads to scheduling collisions, double-booked audition slots, unproctored online assessments, and limited visibility for incoming students.
+
+\textbf{Thapar Society Nexus (SocMag)} is a unified, full-stack web platform engineered to streamline campus society operations for both students and society administrators. Built on a decoupled three-tier architecture, the platform integrates a responsive Next.js frontend and REST API layer, a serverless Neon PostgreSQL database normalized to Boyce-Codd Normal Form (BCNF), and a dedicated Python FastAPI statistical microservice. Core capabilities include institutional \texttt{@thapar.edu} role-based access control, a Gaussian Maximum Likelihood Estimation (MLE) engine for quantitative student-society compatibility scoring, browser-proctored technical assessments with tab-switch telemetry, concurrency-safe non-technical audition slot booking, structured judge rubric evaluation, and a centralized campus event feed. Multi-tier automated testing and live database persistence audits confirm that the platform reliably handles concurrent bookings, statistical scoring, and end-to-end recruitment workflows.
+
+\tableofcontents
+\listoftables
+\newpage
+\pagenumbering{arabic}
+
+% ==============================================================================
+% CHAPTER 1: INTRODUCTION
+% ==============================================================================
+\chapter{Introduction}
+
+\section{Background and Motivation}
+Every academic year at TIET, dozens of technical, cultural, literary, and creative societies conduct recruitment drives and host campus-wide events. Students must navigate varying selection criteria, overlapping timelines, and disparate registration links, while society heads manually coordinate online tests, audition timetables, and candidate shortlists. Centralizing these workflows into a single institutional platform eliminates administrative friction and provides a transparent, data-driven experience for all stakeholders.
+
+\section{Problem Statement}
+Existing campus society management workflows suffer from four core limitations:
+\begin{itemize}[noitemsep]
+    \item \textbf{Discovery Overload:} Students—particularly first-year entrants—lack an objective mechanism to evaluate which societies align with their technical skills, creative interests, and working styles.
+    \item \textbf{Heterogeneous Recruitment Workflows:} Technical societies require timed, auto-graded online assessments with integrity monitoring, whereas non-technical societies rely on portfolio submissions, live auditions, and multi-criteria rubric grading.
+    \item \textbf{Audition Scheduling Conflicts:} Manual spreadsheet-based slot allocation frequently causes double-bookings, race conditions during peak traffic, and synchronization errors.
+    \item \textbf{Fragmented Event Visibility:} Campus workshops, hackathons, and cultural showcases are scattered across platforms without unified registration tracking.
+\end{itemize}
+
+\section{Project Objectives}
+The primary engineering objectives of Thapar Society Nexus are to:
+\begin{enumerate}[noitemsep]
+    \item Enforce institutional access restricted strictly to verified \texttt{@thapar.edu} accounts with role-based permissions for Students, Technical Society Managers, and Non-Technical Society Managers.
+    \item Compute personalized student-society compatibility percentages using a statistical Gaussian MLE microservice.
+    \item Deliver dual-track recruitment pipelines supporting both proctored \textbf{Technical Assessments} and atomic \textbf{Non-Technical Audition Slot Booking} with rubric evaluation.
+    \item Provide a centralized campus event feed with one-click student registration and persistent relational storage.
+\end{enumerate}
+
+% ==============================================================================
+% CHAPTER 2: SOFTWARE REQUIREMENTS & SYSTEM ANALYSIS
+% ==============================================================================
+\chapter{Software Requirements and System Analysis}
+
+\section{User Roles and Access Control}
+The platform enforces Role-Based Access Control (RBAC) across three distinct user personas:
+\begin{itemize}[noitemsep]
+    \item \textbf{Student:} Completes the onboarding interest/personality profile, views MLE compatibility scores across campus societies, attempts technical assessments, submits non-technical portfolios, books audition slots, and registers for campus events.
+    \item \textbf{Technical Society Manager:} Reviews technical test submissions, inspects auto-graded scores alongside anti-cheat proctoring telemetry (\texttt{tab\_switch\_count} and \texttt{focus\_loss\_duration}), and shortlists candidates.
+    \item \textbf{Non-Technical Society Manager:} Reviews candidate portfolios and booked audition schedules, assigns structured rubric grades (\textit{Confidence}, \textit{Technique}, \textit{Creativity}), and tags candidates (\textbf{Green}, \textbf{Yellow}, or \textbf{Red}).
+\end{itemize}
+
+\section{Functional Requirements}
+Table~\ref{tab:frs} summarizes the core functional requirements implemented and verified in the system.
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}l l X@{}}
+\toprule
+\textbf{ID} & \textbf{Module} & \textbf{Functional Specification} \\
+\midrule
+FR-01 & Authentication & Restrict login and account access strictly to \texttt{@thapar.edu} email addresses with role-based session routing. \\
+FR-02 & MLE Matching & Accept multi-dimensional student onboarding vectors and compute normalized compatibility scores via the Python MLE service. \\
+FR-03 & Technical Testing & Render timed assessments, auto-grade responses, and record browser tab-switch and focus-loss events. \\
+FR-04 & Audition Booking & Allow students to reserve available audition slots using atomic conditional locking to prevent double-bookings. \\
+FR-05 & Portfolio & Accept and persist external portfolio links (e.g., Google Drive, GitHub, Behance) for non-technical applications. \\
+FR-06 & Rubric Grading & Enable society managers to score applicants across multiple criteria and persist shortlisting tags. \\
+FR-07 & Campus Events & Display upcoming society events with filtering and one-click student registration persistence. \\
+\bottomrule
+\end{tabularx}
+\caption{Core Functional Requirements of Thapar Society Nexus}
+\label{tab:frs}
+\end{table}
+
+\section{Non-Functional Requirements}
+\begin{itemize}[noitemsep]
+    \item \textbf{Data Integrity \& Concurrency:} Relational tables adhere to BCNF normalization, and slot reservations execute atomically at the SQL layer so simultaneous requests cannot book the same slot.
+    \item \textbf{Service Decoupling:} Statistical scoring is isolated inside an independent FastAPI microservice, allowing mathematical models to scale or update without redeploying the web frontend.
+    \item \textbf{Responsiveness:} The UI adapts cleanly across desktop and mobile viewports with non-blocking toast notifications and optimistic state feedback.
+\end{itemize}
+
+% ==============================================================================
+% CHAPTER 3: SYSTEM ARCHITECTURE & DATABASE DESIGN
+% ==============================================================================
+\chapter{System Architecture and Database Design}
+
+\section{Three-Tier Microservice Architecture}
+Thapar Society Nexus separates presentation, transactional API routing, and statistical inference into three modular layers:
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}l l X@{}}
+\toprule
+\textbf{Architectural Layer} & \textbf{Technology Stack} & \textbf{Core Responsibilities} \\
+\midrule
+Presentation \& API Gateway & Next.js (App Router), React, Tailwind CSS & Server/client rendering, RBAC session management, REST API handlers under \texttt{/api/*} \\
+Statistical Engine & Python 3, FastAPI, Uvicorn & Gaussian MLE likelihood evaluation (\texttt{POST /mle-engine}) with schema validation \\
+Relational Database & Neon Serverless PostgreSQL & ACID-compliant persistence, BCNF schema enforcement, atomic slot updates \\
+Verification Suite & Pytest, Vitest, Playwright & Unit math tests, live API integration tests, and end-to-end browser verification \\
+\bottomrule
+\end{tabularx}
+\caption{Three-Tier Technology Stack}
+\end{table}
+
+\section{REST API Specification}
+All frontend state transitions communicate with backend route handlers backed by PostgreSQL:
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}l l X@{}}
+\toprule
+\textbf{Endpoint} & \textbf{Method} & \textbf{Description} \\
+\midrule
+\texttt{/api/auth/login} & \texttt{POST} & Validates \texttt{@thapar.edu} domain syntax, verifies credentials, and returns user role metadata. \\
+\texttt{/api/societies} & \texttt{GET} & Retrieves all registered TIET societies categorized by Technical and Non-Technical tracks. \\
+\texttt{/api/calculate-compatibility} & \texttt{POST} & Dispatches student trait vectors to FastAPI \texttt{/mle-engine} and persists compatibility scores. \\
+\texttt{/api/test-submit} & \texttt{POST} & Auto-grades technical test answers and stores \texttt{tab\_switch\_count} and \texttt{focus\_loss\_duration}. \\
+\texttt{/api/slots/book} & \texttt{POST} & Atomically transitions an audition slot from \texttt{available} to \texttt{booked} for a student. \\
+\texttt{/api/applications/portfolio} & \texttt{POST} & Stores candidate portfolio URLs and updates application status to \texttt{Applied}. \\
+\texttt{/api/grades} & \texttt{POST} & Persists manager rubric scores (\textit{confidence}, \textit{technique}, \textit{creativity}) and status tags. \\
+\texttt{/api/events} & \texttt{GET/POST} & Fetches scheduled campus events and records student event registrations. \\
+\bottomrule
+\end{tabularx}
+\caption{Backend REST API Endpoints}
+\end{table}
+
+\section{BCNF Relational Database Schema}
+To eliminate update, insertion, and deletion anomalies, the PostgreSQL schema is decomposed into eight normalized relations:
+\begin{enumerate}[noitemsep]
+    \item \texttt{users (\underline{user\_id}, full\_name, email, password\_hash, user\_role, created\_at)}: Stores verified \texttt{@thapar.edu} users with a domain check constraint.
+    \item \texttt{societies (\underline{society\_id}, name, code, category, description, ideal\_vector)}: Stores TIET societies (e.g., CCS, OWASP, MUDRA, FAPS) and their characteristic trait vectors.
+    \item \texttt{compatibility\_scores (\underline{student\_id, society\_id}, match\_percentage, computed\_at)}: Maps each student to their MLE-computed affinity score per society.
+    \item \texttt{test\_submissions (\underline{submission\_id}, student\_id, society\_id, score, tab\_switch\_count, focus\_loss\_duration, submitted\_at)}: Stores technical test outcomes and proctoring metrics.
+    \item \texttt{portfolios (\underline{portfolio\_id}, student\_id, society\_id, portfolio\_url, status, submitted\_at)}: Stores non-technical candidate submissions.
+    \item \texttt{slot\_bookings (\underline{slot\_id}, society\_id, slot\_date, time\_window, status, booked\_by\_student\_id)}: Manages audition time windows with unique booking constraints.
+    \item \texttt{rubric\_grades (\underline{grade\_id}, student\_id, society\_id, confidence, technique, creativity, tag, remarks)}: Stores structured manager evaluations.
+    \item \texttt{event\_registrations (\underline{registration\_id}, event\_id, student\_id, registered\_at)}: Tracks campus event attendance with a composite uniqueness constraint on \texttt{(event\_id, student\_id)}.
+\end{enumerate}
+
+% ==============================================================================
+% CHAPTER 4: GAUSSIAN MLE COMPATIBILITY ENGINE
+% ==============================================================================
+\chapter{Gaussian MLE Compatibility Engine}
+
+\section{Mathematical Formulation}
+Rather than relying on static keyword filters, Thapar Society Nexus models society matching as a continuous multivariate Gaussian likelihood problem. Each student completes an onboarding questionnaire that produces a $d$-dimensional normalized profile vector:
+\begin{equation}
+    \mathbf{x} = (x_1, x_2, \dots, x_d) \in [0, 1]^d
+\end{equation}
+representing attributes such as algorithmic problem-solving, visual design, stage performance, teamwork, and leadership preference. Each campus society $k \in \{1, \dots, K\}$ is parameterized by a mean trait vector $\boldsymbol{\mu}_k = (\mu_{k,1}, \dots, \mu_{k,d})$ and variance vector $\boldsymbol{\sigma}_k^2 = (\sigma_{k,1}^2, \dots, \sigma_{k,d}^2)$.
+
+Assuming conditional independence across trait dimensions, the likelihood of observing student profile $\mathbf{x}$ under society $k$'s distribution is:
+\begin{equation}
+    L(\mathbf{x} \mid \boldsymbol{\mu}_k, \boldsymbol{\sigma}_k) = \prod_{i=1}^{d} \exp\left( -\frac{(x_i - \mu_{k,i})^2}{2\sigma_{k,i}^2} \right)
+\end{equation}
+
+\section{Normalized Compatibility Mapping}
+To prevent floating-point underflow in higher dimensions and yield an intuitive percentage score for students, the FastAPI engine evaluates the dimension-normalized log-likelihood and applies exponential scaling:
+\begin{equation}
+    \text{Compatibility}_k(\mathbf{x}) = 100 \times \exp\left( -\frac{1}{d} \sum_{i=1}^{d} \frac{(x_i - \mu_{k,i})^2}{2\sigma_{k,i}^2} \right)
+\end{equation}
+
+This formulation satisfies three key behavioral invariants:
+\begin{itemize}[noitemsep]
+    \item \textbf{Exact Peak Alignment:} When $\mathbf{x} = \boldsymbol{\mu}_k$, the squared Mahalanobis distance is zero, yielding $\text{Compatibility}_k(\mathbf{x}) = 100.0\%$.
+    \item \textbf{Monotonic Decay:} As a student's preferences diverge from a society's core profile, the score decays smoothly toward $0\%$ without abrupt step discontinuities.
+    \item \textbf{Strict Input Validation:} Pydantic request schemas in FastAPI verify vector dimensionality and numeric bounds before execution, returning HTTP \texttt{422} on malformed payloads.
+\end{itemize}
+
+% ==============================================================================
+% CHAPTER 5: CORE FUNCTIONAL MODULES
+% ==============================================================================
+\chapter{Core Functional Modules}
+
+\section{Institutional Authentication and Onboarding}
+The login gateway validates email syntax on both client and server sides, rejecting any address outside the \texttt{@thapar.edu} institutional domain. Upon first sign-in, students complete a concise onboarding assessment that invokes \texttt{POST /api/calculate-compatibility}, immediately populating their personalized society recommendations in PostgreSQL.
+
+\section{Technical Recruitment and Browser Proctoring}
+For technical societies, the assessment engine delivers timed multiple-choice and logical evaluation questions. To uphold academic integrity without invasive desktop plugins, the client attaches listeners to the browser's Page Visibility API (\texttt{visibilitychange}) and window focus events (\texttt{blur} / \texttt{focus}):
+\begin{enumerate}[noitemsep]
+    \item Whenever the candidate switches browser tabs or minimizes the window during an active test, \texttt{tab\_switch\_count} increments and a visual warning banner alerts the user.
+    \item The elapsed interval until focus returns is accumulated in \texttt{focus\_loss\_duration} (in seconds).
+    \item On submission, the backend computes the objective score and persists both the grade and proctoring telemetry for review by the Technical Society Manager.
+\end{enumerate}
+
+\section{Non-Technical Recruitment and Concurrency-Safe Slot Booking}
+For cultural, fine arts, and management societies, applicants submit a portfolio URL and reserve an in-person or online audition slot. To eliminate race conditions when multiple students select the final slot simultaneously, the booking endpoint executes an atomic conditional update:
+\begin{quote}
+\texttt{UPDATE slot\_bookings SET status = 'booked', booked\_by\_student\_id = \$1 WHERE slot\_id = \$2 AND status = 'available' RETURNING *;}
+\end{quote}
+If two concurrent requests target the same \texttt{slot\_id}, PostgreSQL row-level locking ensures exactly one transaction affects a row (returning HTTP \texttt{200}), while the second receives zero affected rows and a clean conflict response (HTTP \texttt{409}). During auditions, Non-Technical Society Managers score candidates on \textit{Confidence}, \textit{Technique}, and \textit{Creativity} (1--10 scale) and assign a \textbf{Green}, \textbf{Yellow}, or \textbf{Red} recommendation tag.
+
+\section{Unified Campus Event Calendar}
+The Campus Event Feed aggregates upcoming workshops, speaker sessions, and auditions across all TIET societies. Students can filter events by date or category and register with a single click, persisting their enrollment to \texttt{event\_registrations} and immediately updating UI registration state.
+
+% ==============================================================================
+% CHAPTER 6: UI/UX DESIGN SYSTEM
+% ==============================================================================
+\chapter{UI/UX Design System}
+
+The user interface follows a modern \textbf{Pastel Bento-Grid} aesthetic engineered with Tailwind CSS to maximize readability and visual hierarchy:
+\begin{itemize}[noitemsep]
+    \item \textbf{Surface \& Color Tokens:} A warm off-white canvas (\texttt{\#F7F7F5}) paired with crisp white bento cards (\texttt{\#FFFFFF}), subtle hairline borders, and soft pastel category accents (lavender, warm amber, sky blue, soft pink, and sage green).
+    \item \textbf{High-Contrast Controls:} Jet-black (\texttt{\#111111}) primary action buttons, active filter pills, and navigation indicators provide clear visual affordance.
+    \item \textbf{Interactive Micro-Interactions:} Client-side React state powers instant category filtering (\textit{All}, \textit{Technical}, \textit{Non-Technical}, \textit{Top Matches}), an interactive 7-day horizontal date selector for events and audition slots, smooth compatibility score transitions, and floating dark toast notifications confirming database actions.
+\end{itemize}
+
+% ==============================================================================
+% CHAPTER 7: TESTING, VERIFICATION & DEPLOYMENT
+% ==============================================================================
+\chapter{Testing, Verification, and Deployment}
+
+\section{Multi-Tier Testing Strategy}
+System reliability was validated across three complementary testing tiers:
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}l l l X@{}}
+\toprule
+\textbf{Tier} & \textbf{Framework} & \textbf{Target Layer} & \textbf{Verified Scenarios} \\
+\midrule
+Tier 1: Unit & Pytest & FastAPI MLE Engine & $100\%$ score on identical vectors, monotonic decay on orthogonal vectors, HTTP \texttt{422} on invalid dimensions. \\
+Tier 2: Integration & Vitest & Next.js APIs + Neon DB & \texttt{@thapar.edu} domain enforcement, invalid credential rejection, atomic \texttt{409} conflict on double-booked slots, rubric persistence. \\
+Tier 3: End-to-End & Playwright & Full Browser Stack & Student onboarding $\rightarrow$ live MLE scoring $\rightarrow$ technical tab-switch warning $\rightarrow$ slot booking $\rightarrow$ manager grading reload persistence. \\
+\bottomrule
+\end{tabularx}
+\caption{Automated Testing Pyramid Across System Layers}
+\end{table}
+
+\section{End-to-End Persistence Audit}
+Following live walkthroughs across Student, Technical Manager, and Non-Technical Manager sessions, hard browser reloads (\texttt{Ctrl + Shift + R}) and direct SQL audits against Neon PostgreSQL (\texttt{test\_submissions}, \texttt{slot\_bookings}, \texttt{rubric\_grades}, and \texttt{event\_registrations}) confirmed $100\%$ data persistence with zero reliance on hardcoded client-side mock state.
+
+\section{Cloud Deployment Architecture}
+The decoupled codebase supports zero-downtime cloud deployment across managed platforms:
+\begin{itemize}[noitemsep]
+    \item \textbf{Database:} Hosted on Neon Serverless PostgreSQL with SSL-encrypted connection pooling.
+    \item \textbf{MLE Microservice:} Deployed from \texttt{mle-service/} on Render using Uvicorn ASGI workers.
+    \item \textbf{Frontend \& APIs:} Deployed from \texttt{frontend/} on Vercel with environment bindings for \texttt{DATABASE\_URL} and \texttt{MLE\_SERVICE\_URL}.
+\end{itemize}
+
+% ==============================================================================
+% CHAPTER 8: CONCLUSION & FUTURE SCOPE
+% ==============================================================================
+\chapter{Conclusion and Future Scope}
+
+\section{Conclusion}
+Thapar Society Nexus (SocMag) successfully consolidates campus society discovery, dual-track technical and non-technical recruitment, and event management into a cohesive institutional web platform. By combining a statistical Gaussian MLE recommendation engine with browser-proctored technical testing, atomic SQL audition slot booking, and structured rubric grading, the platform resolves the scheduling conflicts, manual overhead, and fragmentation of traditional campus recruitment workflows.
+
+\section{Future Enhancements}
+\begin{itemize}[noitemsep]
+    \item \textbf{Institutional Google Workspace SSO:} Integrating OAuth 2.0 restricted to the \texttt{thapar.edu} Google Workspace tenant for seamless single sign-on.
+    \item \textbf{Automated Transactional Notifications:} Dispatching automated email confirmations and calendar invites upon audition slot booking and shortlisting.
+    \item \textbf{Administrative Analytics Portal:} Providing Student Affairs faculty advisors with cross-society recruitment metrics and participation trends.
+\end{itemize}
+
+% ==============================================================================
+% REFERENCES
+% ==============================================================================
+\begin{thebibliography}{9}
+\bibitem{nextjs} Vercel, \textit{Next.js App Router Documentation}, \url{https://nextjs.org/docs}, 2026.
+\bibitem{fastapi} S. Ram\'irez, \textit{FastAPI Framework Documentation}, \url{https://fastapi.tiangolo.com}, 2026.
+\bibitem{neon} Neon Inc., \textit{Serverless PostgreSQL Architecture}, \url{https://neon.tech/docs}, 2026.
+\bibitem{bishop} C. M. Bishop, \textit{Pattern Recognition and Machine Learning}, Springer, 2006.
+\bibitem{silberschatz} A. Silberschatz, H. F. Korth, and S. Sudarshan, \textit{Database System Concepts}, 7th ed., McGraw-Hill, 2019.
+\end{thebibliography}
+
+\end{document}
