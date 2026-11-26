@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SocMag (Thapar Society Nexus) — Test Case Specification</title>
+<style>
+  @page { size: A4; margin: 20mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    color: #1a1a1a;
+    font-size: 12px;
+    line-height: 1.45;
+    margin: 0;
+    background: #fff;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px; }
+  h1, h2, h3, h4 { font-family: "Segoe UI", Arial, sans-serif; color: #0f172a; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 {
+    font-size: 17px; margin: 0 0 12px; padding-bottom: 6px;
+    border-bottom: 2px solid #991b1b; color: #991b1b;
+  }
+  h3 { font-size: 14px; margin: 18px 0 8px; color: #0f172a; }
+  h4 { font-size: 12.5px; margin: 14px 0 6px; color: #334155; }
+  p { margin: 0 0 8px; }
+  code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 10.8px; background: #f1f1ee; padding: 1px 4px; border-radius: 3px;
+    white-space: nowrap;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 14px; font-size: 11px; }
+  table.summary th, table.summary td { border: 1px solid #333; padding: 5px 7px; text-align: left; vertical-align: top; }
+  table.summary thead th { background: #991b1b; color: #fff; font-family: "Segoe UI", Arial, sans-serif; }
+  table.summary tr.total-row { font-weight: 700; background: #f3f3f1; }
+  table.matrix th, table.matrix td { border: 1px solid #555; padding: 4px 6px; vertical-align: top; font-size: 10.3px; }
+  table.matrix thead th { background: #334155; color: #fff; font-family: "Segoe UI", Arial, sans-serif; }
+  table.matrix tbody tr:nth-child(even) { background: #fafafa; }
+
+  .badge { display: inline-block; font-weight: 700; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-family: "Segoe UI", Arial, sans-serif; }
+  .pos { background: #dbeafe; color: #1e40af; }
+  .neg { background: #fee2e2; color: #991b1b; }
+  .pass { background: #d2f8e4; color: #166534; }
+
+  .tc { border: 1.4px solid #333; border-radius: 4px; margin: 0 0 14px; page-break-inside: avoid; overflow: hidden; }
+  .tc table { margin: 0; }
+  .tc th.tc-head {
+    background: #0f172a; color: #fff; text-align: left; padding: 6px 9px;
+    font-family: "Segoe UI", Arial, sans-serif; font-size: 12.5px;
+  }
+  .tc td.lbl {
+    width: 150px; font-weight: 700; background: #f3f3f1; border: 1px solid #ccc;
+    padding: 5px 9px; vertical-align: top; font-family: "Segoe UI", Arial, sans-serif; font-size: 10.6px;
+    color: #334155;
+  }
+  .tc td.val { border: 1px solid #ccc; padding: 5px 9px; vertical-align: top; }
+  .tc ol, .tc ul { margin: 2px 0 2px 18px; padding: 0; }
+  .tc li { margin-bottom: 2px; }
+
+  .title-page { text-align: center; padding-top: 70px; }
+  .title-page .crest { font-size: 13px; letter-spacing: 2px; color: #991b1b; font-weight: 700; margin-bottom: 30px; font-family: "Segoe UI", Arial, sans-serif; }
+  .title-page h1 { font-size: 30px; margin-bottom: 6px; }
+  .title-page .subtitle { font-size: 15px; color: #475569; margin-bottom: 50px; font-family: "Segoe UI", Arial, sans-serif; }
+  .title-page .doctype { font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #991b1b; font-weight: 700; margin-bottom: 70px; font-family: "Segoe UI", Arial, sans-serif; }
+  .team-table { width: 70%; margin: 0 auto 50px; border-collapse: collapse; font-family: "Segoe UI", Arial, sans-serif; font-size: 12.5px; }
+  .team-table td { border: 1px solid #999; padding: 8px 12px; }
+  .team-table td.k { font-weight: 700; width: 38%; background: #f7f7f5; }
+  .title-page .foot { font-size: 11.5px; color: #64748b; font-family: "Segoe UI", Arial, sans-serif; margin-top: 60px; }
+
+  .page-break { page-break-before: always; }
+  .note-box { background: #fff7e6; border: 1px solid #d97706; border-radius: 4px; padding: 10px 14px; margin: 0 0 14px; font-size: 11.3px; }
+  .gap-box { background: #fef2f2; border: 1px solid #b91c1c; border-radius: 4px; padding: 10px 14px; margin: 0 0 10px; font-size: 11.3px; }
+  .toc { font-family: "Segoe UI", Arial, sans-serif; font-size: 12px; }
+  .toc a { color: #0f172a; text-decoration: none; }
+  .toc li { margin-bottom: 5px; }
+
+  @media print {
+    .wrap { max-width: none; padding: 0; }
+    .tc { page-break-inside: avoid; }
+    table.matrix, table.summary { page-break-inside: auto; }
+    tr { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ TITLE PAGE ============ -->
+  <section class="title-page">
+    <div class="crest">THAPAR INSTITUTE OF ENGINEERING AND TECHNOLOGY, PATIALA</div>
+    <h1>Project SocMag</h1>
+    <div class="subtitle">(Thapar Society Nexus)</div>
+    <div class="doctype">Test Case Specification Document</div>
+
+    <table class="team-table">
+      <tr><td class="k">Team Members</td><td>
+        Shivani Shrivastava (1024170278)<br>
+        Aishna Jindal (1024170247)<br>
+        Muskaan Singhal (1024170248)
+      </td></tr>
+      <tr><td class="k">Faculty Advisor</td><td>Dr. Raghav B. Venkataramaiyer</td></tr>
+      <tr><td class="k">Institution</td><td>Thapar Institute of Engineering and Technology, Patiala</td></tr>
+      <tr><td class="k">Date</td><td>November 2026</td></tr>
+    </table>
+
+    <div class="foot">
+      Automated test suite: 24 test cases across 12 test files, 3 execution tiers (Unit / Integration / End-to-End).<br>
+      All pass counts and durations in this document are from a live re-run of the suite, not estimated.
+    </div>
+  </section>
+
+  <!-- ============ TOC ============ -->
+  <section class="page-break">
+    <h2>Table of Contents</h2>
+    <ol class="toc">
+      <li><a href="#sec1">1. Summary of Results</a></li>
+      <li><a href="#sec2">2. Detailed Test Cases</a></li>
+      <li><a href="#sec3">3. Traceability Matrices</a></li>
+      <li><a href="#sec4">4. Manual Validation &amp; Known Coverage Gaps</a></li>
+    </ol>
+
+    <!-- ============ SECTION 1: SUMMARY ============ -->
+    <h2 id="sec1" style="margin-top:28px;">1. Summary of Results</h2>
+
+    <h3>1.1 By Test Suite</h3>
+    <table class="summary">
+      <thead><tr><th>Suite (file)</th><th>Tier</th><th>Tests</th><th>Passed</th><th>Command</th><th>Duration</th></tr></thead>
+      <tbody>
+        <tr><td><code>mle-service/test_main.py</code></td><td>Unit (pytest)</td><td>6</td><td>6</td><td><code>pytest</code></td><td>5.53s</td></tr>
+        <tr><td><code>frontend/tests/auth.test.ts</code></td><td>Integration (Vitest)</td><td>3</td><td>3</td><td rowspan="8"><code>npm run test:integration</code><br><span style="font-size:9.5px;color:#64748b;">(vitest run)</span></td><td rowspan="8">34.93s<br><span style="font-size:9.5px;color:#64748b;">(8 files, whole run)</span></td></tr>
+        <tr><td><code>frontend/tests/societies.test.ts</code></td><td>Integration (Vitest)</td><td>1</td><td>1</td></tr>
+        <tr><td><code>frontend/tests/compatibility.test.ts</code></td><td>Integration (Vitest)</td><td>1</td><td>1</td></tr>
+        <tr><td><code>frontend/tests/slots.test.ts</code></td><td>Integration (Vitest)</td><td>2</td><td>2</td></tr>
+        <tr><td><code>frontend/tests/test-submit.test.ts</code></td><td>Integration (Vitest)</td><td>2</td><td>2</td></tr>
+        <tr><td><code>frontend/tests/portfolio.test.ts</code></td><td>Integration (Vitest)</td><td>2</td><td>2</td></tr>
+        <tr><td><code>frontend/tests/grades.test.ts</code></td><td>Integration (Vitest)</td><td>3</td><td>3</td></tr>
+        <tr><td><code>frontend/tests/events.test.ts</code></td><td>Integration (Vitest)</td><td>1</td><td>1</td></tr>
+        <tr><td><code>frontend/e2e/student-onboarding.spec.ts</code></td><td>E2E (Playwright)</td><td>1</td><td>1</td><td rowspan="3"><code>npm run test:e2e</code><br><span style="font-size:9.5px;color:#64748b;">(playwright test)</span></td><td>12.1s</td></tr>
+        <tr><td><code>frontend/e2e/track-a-assessment.spec.ts</code></td><td>E2E (Playwright)</td><td>1</td><td>1</td><td>17.6s</td></tr>
+        <tr><td><code>frontend/e2e/track-b-booking-and-grading.spec.ts</code></td><td>E2E (Playwright)</td><td>1</td><td>1</td><td>12.8s<br><span style="font-size:9.5px;color:#64748b;">(total wall time incl. webServer boot: 1.2m)</span></td></tr>
+        <tr class="total-row"><td colspan="2">Total</td><td>24</td><td>24</td><td colspan="2">100% pass, live re-run 2026-11-26</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.2 By Type</h3>
+    <table class="summary">
+      <thead><tr><th>Type</th><th>Suites</th><th>Tests</th><th>Passed</th><th>Pass Rate</th></tr></thead>
+      <tbody>
+        <tr><td>Unit (pytest + FastAPI <code>TestClient</code>)</td><td>1</td><td>6</td><td>6</td><td>100%</td></tr>
+        <tr><td>Integration (Vitest, live Next.js API routes + live DB)</td><td>8</td><td>15</td><td>15</td><td>100%</td></tr>
+        <tr><td>End-to-End (Playwright, live UI + both live servers)</td><td>3</td><td>3</td><td>3</td><td>100%</td></tr>
+        <tr class="total-row"><td>Total</td><td>12</td><td>24</td><td>24</td><td>100%</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.3 By Feature Area</h3>
+    <table class="summary">
+      <thead><tr><th>Feature Area</th><th>Positive</th><th>Negative</th><th>Total</th><th>Test IDs</th></tr></thead>
+      <tbody>
+        <tr><td>Authentication</td><td>1</td><td>2</td><td>3</td><td>TC-AUTH-01…03</td></tr>
+        <tr><td>Society Discovery &amp; Compatibility Matching</td><td>6</td><td>3</td><td>9</td><td>TC-SOC-01, TC-MLE-01…06, TC-COMPAT-01, TC-E2E-01</td></tr>
+        <tr><td>Track A — Technical Assessment</td><td>2</td><td>1</td><td>3</td><td>TC-TEST-01…02, TC-E2E-02</td></tr>
+        <tr><td>Track B — Non-Technical Audition</td><td>3</td><td>2</td><td>5</td><td>TC-PORT-01…02, TC-SLOT-01…02, TC-E2E-03</td></tr>
+        <tr><td>Manager Grading &amp; Shortlisting</td><td>2</td><td>1</td><td>3</td><td>TC-GRAD-01…03</td></tr>
+        <tr><td>Campus Events</td><td>1</td><td>0</td><td>1</td><td>TC-EVNT-01</td></tr>
+        <tr class="total-row"><td>Total</td><td>15</td><td>9</td><td>24</td><td></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ SECTION 2: DETAILED TEST CASES ============ -->
+  <section class="page-break">
+    <h2 id="sec2">2. Detailed Test Cases</h2>
+
+    <h3>2.1 Unit Tests — MLE Compatibility Service (pytest)</h3>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-MLE-01 — Health check endpoint</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Unit · <span class="badge pos">Positive</span> · Role: N/A (service-level)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>mle-service/test_main.py:17-22</code> — <code>test_health</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>mle-service/main.py:65-67</code> — <code>GET /health</code></td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A load balancer / dev script needs to confirm the MLE service process is up before routing traffic to it.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">FastAPI app importable; no DB or network dependency.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>Issue <code>GET /health</code> via <code>TestClient</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; body <code>{"status": "ok"}</code>.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-MLE-02 — Identical feature vector scores a perfect match</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Unit · <span class="badge pos">Positive</span> · Role: N/A</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>mle-service/test_main.py:23-35</code> — <code>test_perfect_match_scores_100</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>mle-service/main.py:70-95</code> — <code>POST /mle-engine</code> (<code>mle_engine</code>)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A student's interest vector exactly equals a society's ideal persona — the Gaussian-likelihood model must report this as a perfect match.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val"><code>feature_vector == ideal_persona</code>, both built from the same 8 <code>INTEREST_TAGS</code>.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST identical <code>feature_vector</code>/<code>ideal_persona</code> vectors.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; <code>compatibility_score == 100.0</code>; <code>mahalanobis_distance == 0.0</code>.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-MLE-03 — Opposite feature vectors score near zero</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Unit · <span class="badge pos">Positive</span> (valid request, extreme input) · Role: N/A</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>mle-service/test_main.py:36-46</code> — <code>test_opposite_vectors_score_near_zero</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>mle-service/main.py:70-95</code> — <code>POST /mle-engine</code></td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A student whose interests are the complete opposite of a society's ideal persona should receive a very low compatibility score, not a crash or a misleadingly high one.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val"><code>feature_vector</code> and <code>ideal_persona</code> are inverse across every dimension (e.g. 1.0 vs 0.0 per tag).</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST the inverse vectors to <code>/mle-engine</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; <code>compatibility_score &lt; 1.0</code>; <code>mahalanobis_distance &gt; 10.0</code>.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-MLE-04 — Mismatched vector keys rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Unit · <span class="badge neg">Negative</span> · Role: N/A</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>mle-service/test_main.py:47-57</code> — <code>test_mismatched_keys_rejected</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>mle-service/main.py:45-62</code> — <code>_validate_keys</code> (key-set mismatch branch, lines 48-56)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A malformed request supplies different interest tags in <code>feature_vector</code> vs <code>ideal_persona</code>; the service must reject it rather than compute on misaligned dimensions.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val"><code>feature_vector.keys() != ideal_persona.keys()</code>.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST vectors whose key sets differ.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 400.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-MLE-05 — Unknown interest tag rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Unit · <span class="badge neg">Negative</span> · Role: N/A</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>mle-service/test_main.py:58-67</code> — <code>test_unknown_interest_tag_rejected</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>mle-service/main.py:45-62</code> — <code>_validate_keys</code> (unknown-tag branch, lines 57-61) against <code>INTEREST_TAGS</code> (lines 19-28)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A request uses a tag the platform doesn't recognize (typo or stale client) — must fail closed rather than silently mis-score.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Vector contains a key not in the fixed 8-tag <code>INTEREST_TAGS</code> tuple.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST a vector containing an invalid tag key.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 400.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-MLE-06 — Missing required field rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Unit · <span class="badge neg">Negative</span> · Role: N/A</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>mle-service/test_main.py:68-73</code> — <code>test_missing_required_field_rejected</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>mle-service/main.py:33-36</code> — <code>MLERequest</code> Pydantic model (required <code>feature_vector</code>/<code>ideal_persona</code> fields)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A caller omits a required field entirely — FastAPI/Pydantic's own schema validation must catch this before <code>mle_engine</code> body ever runs.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Request body omits <code>ideal_persona</code> (or another required field).</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST a body missing a required field.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 422 (FastAPI validation error).</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <h3>2.2 Integration Tests — Next.js API Routes (Vitest, live DB)</h3>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-AUTH-01 — Valid login succeeds</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Student</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/auth.test.ts:18-28</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/auth/login/route.ts:7-48</code> — <code>POST /api/auth/login</code></td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A student with a correct <code>@thapar.edu</code> email and password signs in and is routed by role.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Synthetic student <code>test-student-auth</code> / <code>test.auth@thapar.edu</code> created via <code>beforeAll</code> (line 8), roll <code>TEST000001</code>.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST <code>{email, password}</code> matching the fixture.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; <code>body.user.email</code> matches; <code>body.role === "student"</code>.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-1 Authentication</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-AUTH-02 — Non-institutional email rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge neg">Negative</span> · Role: Student (unauthenticated)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/auth.test.ts:30-37</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/auth/login/route.ts:5,12-17</code> — <code>THAPAR_EMAIL</code> regex check</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">Only verified campus accounts (<code>@thapar.edu</code>) may sign in; any other domain must be rejected before a DB lookup even runs.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">None (pre-DB validation).</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST an email on a non-<code>@thapar.edu</code> domain with any password.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 400.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-1 Authentication</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-AUTH-03 — Correct email, wrong password rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge neg">Negative</span> · Role: Student (unauthenticated)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/auth.test.ts:39-46</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/auth/login/route.ts:22-35</code> — user lookup + <code>bcrypt.compare</code></td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A valid student email with an incorrect password must not authenticate.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Same fixture student as TC-AUTH-01 exists.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST the fixture's correct email with a wrong password string.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 401.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-1 Authentication</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-SOC-01 — Society directory lists all societies</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Student (any authenticated role)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/societies.test.ts:6-16</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/societies/route.ts:4-25</code> — <code>GET /api/societies</code></td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">The Societies page needs the full, ordered list of campus societies with their type and manager.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Seed data: 8 societies present in the database.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>GET <code>/api/societies</code> with no query params.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; array of 8 societies, each with <code>id</code>, <code>name</code>, <code>type</code>, <code>managerId</code> fields.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-2 Society Discovery &amp; Listing</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-COMPAT-01 — Compatibility scores computed for all societies</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Student</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/compatibility.test.ts:28-43</code> (fixture <code>FEATURE_VECTOR</code>, lines 7-16)</td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/calculate-compatibility/route.ts:6-68</code> — <code>POST /api/calculate-compatibility</code> (calls mle-service <code>POST /mle-engine</code> per society, lines 30-46)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">After a student completes the onboarding quiz, the platform must score their fit against every society and rank the results.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val"><code>test-student-compat</code> fixture student exists; mle-service running on :8000; full 8-key feature vector supplied.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST <code>{studentId, featureVector}</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; <code>scores</code> array covering all 8 societies, sorted descending by <code>compatibilityScore</code>.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-SLOT-01 — Interview slot booking succeeds</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Student (Shortlisted)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/slots.test.ts:27-37</code> (fixtures in <code>beforeAll</code>, line 15)</td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/slots/book/route.ts:4-63</code> — <code>POST /api/slots/book</code> (success path, lines 38-43)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A shortlisted student books an open interview slot for a Non-Tech society.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val"><code>test-student-slots</code> with an application on <code>soc-ccs</code> at status <code>Shortlisted</code>; open slot <code>TEST-SLOT-VITEST</code> dated 2099-06-01 10:00.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST <code>{slotId, applicationId}</code> for the open slot.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; <code>slot.status === "booked"</code>; application moves to <code>Interview_Booked</code> (route lines 38-41).</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-6 Audition / Interview Slot Booking</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-SLOT-02 — Double-booking an already-booked slot is rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge neg">Negative</span> · Role: Student</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/slots.test.ts:38-46</code> — re-books the same slot booked by TC-SLOT-01</td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/slots/book/route.ts:18-36</code> — atomic guard: <code>UPDATE slot_bookings … WHERE id=$2 AND application_id IS NULL</code>; <code>rowCount === 0</code> → ROLLBACK + 409</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">Two students must never end up assigned to the same physical interview slot, even under a race.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">The slot from TC-SLOT-01 is already booked (<code>application_id</code> set).</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST the same <code>slotId</code> again with any <code>applicationId</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 409; transaction rolled back; original booking untouched.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-6 Audition / Interview Slot Booking</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-TEST-01 — Proctored assessment submission is scored</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Student (Track A / TECH)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/test-submit.test.ts:24-41</code> (fixtures in <code>beforeAll</code>, line 13)</td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/test-submit/route.ts:10-64</code> — <code>POST /api/test-submit</code> (grading against <code>MCQ_BANK</code>, lines 21-28; transaction, lines 30-54)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A Track A applicant submits answers to the proctored assessment and receives an automatically computed score.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val"><code>test-student-submit</code> with a <code>Pending</code> application on <code>soc-ccs</code> (TECH).</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST <code>{applicationId, answers}</code> with one answered question.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; numeric score in range 0–100; application status becomes <code>Assessed</code>.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-4 Track A Technical Assessment</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-TEST-02 — Submission without applicationId rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge neg">Negative</span> · Role: Student</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/test-submit.test.ts:42-50</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/test-submit/route.ts:17-19</code> — required-field validation</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A malformed submit request (missing the application reference) must not be scored or persisted.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">None.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST a body omitting <code>applicationId</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 400.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-4 Track A Technical Assessment</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-PORT-01 — Valid portfolio URL accepted</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Student (Track B / NON_TECH)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/portfolio.test.ts:24-34</code> (fixtures in <code>beforeAll</code>, line 13)</td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/applications/portfolio/route.ts:4-42</code> — <code>POST /api/applications/portfolio</code> (update, lines 22-26)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A Track B applicant attaches a work-sample link to their application.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val"><code>test-student-portfolio</code> with a <code>Pending</code> application on <code>soc-faps</code> (NON_TECH).</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST <code>{applicationId, portfolioUrl}</code> with a well-formed URL.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; application's <code>portfolio_url</code> updated.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-5 Track B Non-Technical Application</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-PORT-02 — Malformed URL rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge neg">Negative</span> · Role: Student</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/portfolio.test.ts:35-43</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/applications/portfolio/route.ts:16-20</code> — URL validation via <code>new URL()</code> try/catch</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A non-URL string (e.g. pasted text) must not be stored as a portfolio link.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Same fixture application as TC-PORT-01.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>POST <code>{applicationId, portfolioUrl: "not-a-url"}</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 400.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-5 Track B Non-Technical Application</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-GRAD-01 — Tech grading roster returned</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Society Manager (TECH)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/grades.test.ts:6-12</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/grades/route.ts:4-66</code> — <code>GET /api/grades?type=TECH</code> (TECH branch, lines 7-31)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A Tech society manager opens the Grading dashboard and needs every applicant's assessment score.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Seeded TECH applications exist.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>GET <code>/api/grades?type=TECH</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; array of TECH grading rows.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-7 Manager Grading &amp; Shortlisting</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-GRAD-02 — Non-Tech grading roster returned</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Society Manager (NON_TECH)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/grades.test.ts:13-19</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/grades/route.ts:4-66</code> — <code>GET /api/grades?type=NON_TECH</code> (NON_TECH branch, lines 33-60)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A Non-Tech society manager opens their Grading dashboard and needs every applicant's rubric status.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Seeded NON_TECH applications exist.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>GET <code>/api/grades?type=NON_TECH</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; array of NON_TECH grading rows.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-7 Manager Grading &amp; Shortlisting</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-GRAD-03 — Invalid grading type rejected</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge neg">Negative</span> · Role: Society Manager</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/grades.test.ts:20-24</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/grades/route.ts:62-65</code> — unrecognized <code>type</code> query param, 400 branch</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">Only the two recognized society types may be queried; any other value must fail explicitly.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">None.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>GET <code>/api/grades?type=BOGUS</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 400.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-7 Manager Grading &amp; Shortlisting</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-EVNT-01 — Campus event feed lists events</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">Integration · <span class="badge pos">Positive</span> · Role: Student (any authenticated role)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/tests/events.test.ts:6-13</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/api/events/route.ts:4-26</code> — <code>GET /api/events</code></td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">The Feed page needs the list of upcoming society events with registration counts.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Seeded events exist.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol><li>GET <code>/api/events</code>.</li></ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">HTTP 200; non-empty array of events.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-8 Campus Event Feed</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26</td></tr>
+    </table></div>
+
+    <h3>2.3 End-to-End Tests — Full UI + Both Live Servers (Playwright)</h3>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-E2E-01 — Onboarding quiz produces a persona match and filters Top Matches</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">E2E · <span class="badge pos">Positive</span> · Role: Student</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/e2e/student-onboarding.spec.ts:6-29</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val">
+        <code>frontend/app/student/layout.tsx:34-47</code> (auto-opens the quiz for a student with no saved persona)<br>
+        <code>frontend/components/OnboardingQuiz.tsx:72-109</code> (<code>computeResult</code> → calls <code>/api/calculate-compatibility</code>)<br>
+        <code>frontend/app/student/societies/page.tsx:29-37</code> (<code>TOP_MATCHES</code> filter)
+      </td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A first-time student logs in, is prompted with the onboarding quiz, and afterwards sees societies the engine recommended under "Top Matches".</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">Synthetic e2e student (<code>E2E_STUDENT_EMAIL</code>) seeded with no saved <code>personaResult</code>, via <code>e2e/globalSetup.ts</code>.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol>
+        <li>Log in via the real login form (<code>loginAs</code> helper).</li>
+        <li>Select Coding + Robotics &amp; Hardware interests and the Technical/Programming skill in the quiz.</li>
+        <li>Submit and view the persona result screen.</li>
+        <li>Close the quiz, navigate to Societies, click the "Top Matches" filter pill.</li>
+      </ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">Persona archetype text and a score matching <code>/^\d+%$/</code> are visible; after closing, "Top Matches" is no longer empty.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-2 Society Discovery &amp; Listing; FR-3 Compatibility / Persona Matching</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26 (12.1s)</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-E2E-02 — Proctored assessment with live anti-cheat detection</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">E2E · <span class="badge pos">Positive</span> · Role: Student (Track A / TECH)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/e2e/track-a-assessment.spec.ts:6-49</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val"><code>frontend/app/student/societies/[id]/assessment/page.tsx:16-208</code> — application/question setup (lines 40-60), anti-cheat listeners (lines 64-100), submit (lines 102-125)</td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A Track A applicant takes the proctored test; the UI must visibly log tab switches and away-time, and submission must score and transition the application.</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">E2E student logged in; <code>E2E_TECH_SOCIETY_ID</code> is a TECH society with no prior application.</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol>
+        <li>Navigate to the TECH society, dismiss the onboarding quiz, click "Take Proctored Assessment".</li>
+        <li>Answer all 8 questions (first option each).</li>
+        <li>Dispatch a synthetic <code>visibilitychange</code> (<code>document.hidden = true</code>) via <code>page.evaluate</code>.</li>
+        <li>Assert the "Tab switch detected" banner and a "1 switches" counter.</li>
+        <li>Dispatch <code>blur</code>, wait 1100ms (real time), dispatch <code>focus</code>.</li>
+        <li>Assert a focus-loss counter matching <code>/[1-9]\d*s away/</code>.</li>
+        <li>Submit the assessment.</li>
+      </ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">Returns to the society page; status shows "Assessed" with a score matching <code>/^\d+\/100$/</code>.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-4 Track A Technical Assessment</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26 (17.6s)</td></tr>
+    </table></div>
+
+    <div class="tc"><table>
+      <tr><th class="tc-head" colspan="2">TC-E2E-03 — Interview booking and server-persisted grading across accounts</th></tr>
+      <tr><td class="lbl">Type / Polarity / Roles</td><td class="val">E2E · <span class="badge pos">Positive</span> · Role: Student (booking) → Society Manager, NON_TECH (grading)</td></tr>
+      <tr><td class="lbl">Test Location</td><td class="val"><code>frontend/e2e/track-b-booking-and-grading.spec.ts:9-46</code></td></tr>
+      <tr><td class="lbl">Code Under Test</td><td class="val">
+        <code>frontend/components/BookInterviewModal.tsx:26-64</code> (slot list + <code>confirm()</code> → <code>POST /api/slots/book</code>)<br>
+        <code>frontend/app/student/societies/[id]/page.tsx:203-215</code> (booking CTA)<br>
+        <code>frontend/app/manager/grading/page.tsx:60-68</code> (<code>setGrade</code> → <code>POST /api/grades</code>, <code>action: "rubric"</code>)<br>
+        <code>frontend/app/api/grades/route.ts:87-109</code> (rubric branch)
+      </td></tr>
+      <tr><td class="lbl">Use Case</td><td class="val">A shortlisted student books one of two synthetic audition slots via the real UI; a Non-Tech manager then grades them, and the grade must survive a hard page reload (server-side persistence, not client state).</td></tr>
+      <tr><td class="lbl">Preconditions</td><td class="val">E2E student pre-seeded <code>Shortlisted</code> on <code>E2E_NONTECH_SOCIETY_ID</code>; two <code>TEST-SLOT-E2E-*</code> slots open (<code>e2e/globalSetup.ts</code>).</td></tr>
+      <tr><td class="lbl">Steps</td><td class="val"><ol>
+        <li>Log in as the e2e student, open the Non-Tech society, book one of the two open slots, confirm "Interview booked".</li>
+        <li><code>switchAccount</code>: clear <code>localStorage</code> and return to <code>/login</code> (no logout button exists on this page by design — a deliberate test-helper workaround).</li>
+        <li>Log in as the real seeded Non-Tech manager (<code>devansh.sethi@thapar.edu</code>).</li>
+        <li>Open <code>/manager/grading</code>, switch to Non-Tech View, find "Test Student"'s row, click the GREEN grade dot.</li>
+        <li>Reload the page and re-switch to Non-Tech View.</li>
+      </ol></td></tr>
+      <tr><td class="lbl">Expected Result</td><td class="val">After reload, the GREEN dot's background color is still non-transparent — the grade was persisted server-side, not just in React state.</td></tr>
+      <tr><td class="lbl">SRS Requirement(s)</td><td class="val">FR-6 Audition / Interview Slot Booking; FR-7 Manager Grading &amp; Shortlisting</td></tr>
+      <tr><td class="lbl">Pass Status</td><td class="val"><span class="badge pass">PASS</span> — confirmed in live re-run, 2026-11-26 (12.8s)</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ SECTION 3: TRACEABILITY ============ -->
+  <section class="page-break">
+    <h2 id="sec3">3. Traceability Matrices</h2>
+
+    <h3>3.1 API Endpoints → Test Cases</h3>
+    <table class="matrix">
+      <thead><tr><th>Endpoint</th><th>Direct Test Case(s)</th><th>Indirect / E2E-only Coverage</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /health</code> (mle-service)</td><td>TC-MLE-01</td><td>—</td></tr>
+        <tr><td><code>POST /mle-engine</code> (mle-service)</td><td>TC-MLE-02…06</td><td>TC-COMPAT-01, TC-E2E-01 (via calculate-compatibility)</td></tr>
+        <tr><td><code>POST /api/auth/login</code></td><td>TC-AUTH-01…03</td><td>TC-E2E-01…03 (real sign-in on every e2e run)</td></tr>
+        <tr><td><code>GET /api/societies</code></td><td>TC-SOC-01</td><td>TC-E2E-01…03</td></tr>
+        <tr><td><code>POST /api/calculate-compatibility</code></td><td>TC-COMPAT-01</td><td>TC-E2E-01</td></tr>
+        <tr><td><code>POST /api/applications</code></td><td style="color:#991b1b;">— none</td><td>TC-E2E-02 (assessment page creates/resumes application)</td></tr>
+        <tr><td><code>GET /api/applications</code></td><td style="color:#991b1b;">— none</td><td>TC-E2E-02, TC-E2E-03 (society detail page status check)</td></tr>
+        <tr><td><code>POST /api/applications/portfolio</code></td><td>TC-PORT-01…02</td><td>—</td></tr>
+        <tr><td><code>GET /api/slots</code></td><td style="color:#991b1b;">— none</td><td>TC-E2E-03 (BookInterviewModal slot list)</td></tr>
+        <tr><td><code>POST /api/slots/book</code></td><td>TC-SLOT-01…02</td><td>TC-E2E-03</td></tr>
+        <tr><td><code>GET /api/test-questions</code></td><td style="color:#991b1b;">— none</td><td>TC-E2E-02</td></tr>
+        <tr><td><code>POST /api/test-submit</code></td><td>TC-TEST-01…02</td><td>TC-E2E-02</td></tr>
+        <tr><td><code>GET /api/grades</code></td><td>TC-GRAD-01…03</td><td>—</td></tr>
+        <tr><td><code>POST /api/grades</code> (<code>action=rubric</code>)</td><td style="color:#991b1b;">— none</td><td>TC-E2E-03</td></tr>
+        <tr><td><code>POST /api/grades</code> (<code>action=shortlist</code>)</td><td colspan="2" style="color:#991b1b;">Not exercised by any test — coverage gap</td></tr>
+        <tr><td><code>POST /api/grades</code> (<code>action=bulkShortlistGreen</code>)</td><td colspan="2" style="color:#991b1b;">Not exercised by any test — coverage gap</td></tr>
+        <tr><td><code>GET /api/events</code></td><td>TC-EVNT-01</td><td>TC-E2E-03 (society detail "Upcoming events")</td></tr>
+        <tr><td><code>POST /api/events/register</code></td><td colspan="2" style="color:#991b1b;">Not exercised by any test — coverage gap</td></tr>
+        <tr><td><code>PATCH /api/societies/[id]</code></td><td colspan="2" style="color:#991b1b;">Not exercised by any test, in any tier — coverage gap</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.2 User Roles → Permission Tests</h3>
+    <table class="matrix">
+      <thead><tr><th>Role</th><th>Allowed (Positive)</th><th>Blocked (Negative)</th></tr></thead>
+      <tbody>
+        <tr><td>Student (unauthenticated → authenticated)</td><td>TC-AUTH-01</td><td>TC-AUTH-02, TC-AUTH-03</td></tr>
+        <tr><td>Student (Track A / TECH applicant)</td><td>TC-TEST-01, TC-E2E-02</td><td>TC-TEST-02</td></tr>
+        <tr><td>Student (Track B / NON_TECH applicant)</td><td>TC-PORT-01, TC-SLOT-01, TC-E2E-03 (booking)</td><td>TC-PORT-02, TC-SLOT-02</td></tr>
+        <tr><td>Student (general / browsing)</td><td>TC-SOC-01, TC-COMPAT-01, TC-EVNT-01, TC-E2E-01</td><td>—</td></tr>
+        <tr><td>Society Manager — TECH</td><td>TC-GRAD-01</td><td>TC-GRAD-03</td></tr>
+        <tr><td>Society Manager — NON_TECH</td><td>TC-GRAD-02, TC-E2E-03 (grading)</td><td>TC-GRAD-03</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">
+      <strong>Honest gap:</strong> no automated test exercises a manager acting on a society they do <em>not</em> own. <code>PATCH /api/societies/[id]</code> does implement an ownership check (<code>requestingUserId</code> vs <code>manager_id</code>, route lines 24-41, returning 403 on mismatch), but the route has zero test coverage of any kind, so that 403 branch is unverified by the suite. The grading routes (<code>/api/grades</code>) implement no equivalent ownership check in the source at all, and no test exists to probe for one — see §4.
+    </div>
+
+    <h3>3.3 Source Files → Test Cases</h3>
+    <table class="matrix">
+      <thead><tr><th>Source file</th><th>Test Case(s)</th></tr></thead>
+      <tbody>
+        <tr><td><code>mle-service/main.py</code></td><td>TC-MLE-01…06, TC-COMPAT-01, TC-E2E-01</td></tr>
+        <tr><td><code>frontend/app/api/auth/login/route.ts</code></td><td>TC-AUTH-01…03, TC-E2E-01…03</td></tr>
+        <tr><td><code>frontend/app/api/societies/route.ts</code></td><td>TC-SOC-01, TC-E2E-01…03</td></tr>
+        <tr><td><code>frontend/app/api/societies/[id]/route.ts</code></td><td style="color:#991b1b;">— none (gap)</td></tr>
+        <tr><td><code>frontend/app/api/calculate-compatibility/route.ts</code></td><td>TC-COMPAT-01, TC-E2E-01</td></tr>
+        <tr><td><code>frontend/app/api/applications/route.ts</code></td><td>TC-E2E-02, TC-E2E-03 (indirect only)</td></tr>
+        <tr><td><code>frontend/app/api/applications/portfolio/route.ts</code></td><td>TC-PORT-01…02</td></tr>
+        <tr><td><code>frontend/app/api/slots/route.ts</code></td><td>TC-E2E-03 (indirect only)</td></tr>
+        <tr><td><code>frontend/app/api/slots/book/route.ts</code></td><td>TC-SLOT-01…02, TC-E2E-03</td></tr>
+        <tr><td><code>frontend/app/api/test-questions/route.ts</code></td><td>TC-E2E-02 (indirect only)</td></tr>
+        <tr><td><code>frontend/app/api/test-submit/route.ts</code></td><td>TC-TEST-01…02, TC-E2E-02</td></tr>
+        <tr><td><code>frontend/app/api/grades/route.ts</code></td><td>TC-GRAD-01…03, TC-E2E-03 (rubric action only)</td></tr>
+        <tr><td><code>frontend/app/api/events/route.ts</code></td><td>TC-EVNT-01, TC-E2E-03</td></tr>
+        <tr><td><code>frontend/app/api/events/register/route.ts</code></td><td style="color:#991b1b;">— none (gap)</td></tr>
+        <tr><td><code>frontend/app/student/layout.tsx</code></td><td>TC-E2E-01</td></tr>
+        <tr><td><code>frontend/components/OnboardingQuiz.tsx</code></td><td>TC-E2E-01</td></tr>
+        <tr><td><code>frontend/app/student/societies/page.tsx</code></td><td>TC-E2E-01</td></tr>
+        <tr><td><code>frontend/app/student/societies/[id]/page.tsx</code></td><td>TC-E2E-02, TC-E2E-03</td></tr>
+        <tr><td><code>frontend/app/student/societies/[id]/assessment/page.tsx</code></td><td>TC-E2E-02</td></tr>
+        <tr><td><code>frontend/components/BookInterviewModal.tsx</code></td><td>TC-E2E-03</td></tr>
+        <tr><td><code>frontend/app/manager/grading/page.tsx</code></td><td>TC-E2E-03</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.4 SRS Functional Requirements → Test Cases</h3>
+    <div class="note-box">
+      No formal SRS document exists in this repository. The requirement IDs below (FR-1…FR-9) were synthesized from the platform's actual built feature set for the sole purpose of this traceability matrix, and should be reconciled with any future official SRS.
+    </div>
+    <table class="matrix">
+      <thead><tr><th>ID</th><th>Functional Requirement</th><th>Test Case(s)</th></tr></thead>
+      <tbody>
+        <tr><td>FR-1</td><td>Campus-restricted authentication &amp; role-based routing</td><td>TC-AUTH-01…03, TC-E2E-01…03</td></tr>
+        <tr><td>FR-2</td><td>Society discovery &amp; listing (browse, filter by type / top matches)</td><td>TC-SOC-01, TC-E2E-01</td></tr>
+        <tr><td>FR-3</td><td>Interest → society compatibility / persona matching (MLE engine)</td><td>TC-MLE-01…06, TC-COMPAT-01, TC-E2E-01</td></tr>
+        <tr><td>FR-4</td><td>Track A: proctored technical assessment with anti-cheat logging &amp; auto-grading</td><td>TC-TEST-01…02, TC-E2E-02</td></tr>
+        <tr><td>FR-5</td><td>Track B: non-technical application &amp; portfolio submission</td><td>TC-PORT-01…02</td></tr>
+        <tr><td>FR-6</td><td>Audition / interview slot scheduling with double-booking prevention</td><td>TC-SLOT-01…02, TC-E2E-03</td></tr>
+        <tr><td>FR-7</td><td>Manager grading, rubric scoring &amp; shortlisting</td><td>TC-GRAD-01…03, TC-E2E-03</td></tr>
+        <tr><td>FR-8</td><td>Campus event feed &amp; registration</td><td>TC-EVNT-01</td></tr>
+        <tr><td>FR-9</td><td>Society profile management by its own manager</td><td style="color:#991b1b;">— none (gap)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ SECTION 4: MANUAL VALIDATION & GAPS ============ -->
+  <section class="page-break">
+    <h2 id="sec4">4. Manual Validation &amp; Known Coverage Gaps</h2>
+
+    <h3>4.1 Manual Validation Performed During Development</h3>
+    <p>Two behaviors were manually exercised in the browser before — and in addition to — the automated coverage above:</p>
+    <ul>
+      <li><strong>Concurrent slot booking.</strong> Two browser sessions raced a booking request against the same interview slot to confirm only one request succeeds and the other is rejected, under genuine simultaneous load. TC-SLOT-02 automates the <em>sequential</em> case (book, then immediately re-book) against the same <code>UPDATE … WHERE application_id IS NULL</code> guard, but does not itself issue two requests in parallel — see §4.2.</li>
+      <li><strong>Hard-refresh persistence of a grading decision.</strong> After setting a GREEN rubric grade as a manager, the page was hard-refreshed to confirm the grade was read back from the database rather than held only in React state. This check is now fully automated as the final step of TC-E2E-03.</li>
+    </ul>
+
+    <h3>4.2 Known Coverage Gaps</h3>
+    <div class="gap-box"><strong>Zero automated coverage:</strong> <code>POST /api/events/register</code> — the event-registration endpoint is not called by any Unit, Integration, or E2E test.</div>
+    <div class="gap-box"><strong>Zero automated coverage:</strong> <code>PATCH /api/societies/[id]</code> — the society-profile-edit endpoint, including its ownership check (403 on manager/society mismatch), is not exercised by any test.</div>
+    <div class="gap-box"><strong>Partial coverage:</strong> <code>POST /api/grades</code> is only tested for its <code>action: "rubric"</code> branch (via TC-E2E-03). The <code>action: "shortlist"</code> and <code>action: "bulkShortlistGreen"</code> branches have no test.</div>
+    <div class="gap-box"><strong>Indirect-only coverage:</strong> <code>POST /api/applications</code>, <code>GET /api/applications</code>, <code>GET /api/slots</code>, and <code>GET /api/test-questions</code> are exercised only as a side effect of the Playwright UI flows (TC-E2E-02/03). No Vitest integration test calls these routes directly and asserts on their response contract in isolation — the Vitest fixture helper (<code>frontend/tests/helpers/testDb.ts</code>) deliberately bypasses them with direct SQL inserts for test speed.</div>
+    <div class="gap-box"><strong>Missing negative/permission test:</strong> no test verifies that a manager is blocked from grading or shortlisting applicants of a society they do not manage — unlike <code>PATCH /api/societies/[id]</code>, the grading routes implement no such ownership check in the source at all, so there is nothing to test yet, and this should be treated as a product gap as well as a test gap.</div>
+    <div class="gap-box"><strong>Race-condition coverage is manual-only:</strong> TC-SLOT-02 proves the atomic guard rejects a <em>second, sequential</em> booking attempt; it does not itself send two requests concurrently. The concurrent case was checked manually (§4.1) but has no automated regression test.</div>
+
+    <p style="margin-top:16px; color:#64748b; font-size:11px;">
+      This document reflects the test suite and source tree exactly as they stood on 2026-11-26. It was generated by inspecting every file named above on disk and by re-running all three test tiers live; no pass count or duration in §1 or §2 was estimated or carried over from a prior session.
+    </p>
+  </section>
+
+</div>
+</body>
+</html>

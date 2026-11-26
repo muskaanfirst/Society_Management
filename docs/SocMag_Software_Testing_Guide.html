@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SocMag — Software Testing Guide</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 11.6px;
+    line-height: 1.48;
+    margin: 0;
+    background: #fff;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 22px; }
+  h1, h2, h3 { font-family: "Segoe UI", Arial, sans-serif; color: #0f172a; }
+  h2 {
+    font-size: 16.5px; margin: 0 0 10px; padding: 7px 12px;
+    background: #0f172a; color: #fff; border-radius: 5px;
+  }
+  h3 { font-size: 12.8px; margin: 14px 0 6px; color: #991b1b; }
+  p { margin: 0 0 8px; }
+  code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 10.6px; background: #f1f1ee; padding: 1px 4px; border-radius: 3px;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 12px; font-size: 10.7px; }
+  th, td { border: 1px solid #333; padding: 5px 7px; text-align: left; vertical-align: top; }
+  thead th { background: #991b1b; color: #fff; }
+  tbody tr:nth-child(even) { background: #fafafa; }
+
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 14px 16px; margin: 0 0 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); page-break-inside: avoid; }
+  .card.accent-crimson { border-left: 5px solid #991b1b; }
+  .card.accent-amber { border-left: 5px solid #d97706; }
+  .card.accent-navy { border-left: 5px solid #0f172a; }
+  .card.accent-green { border-left: 5px solid #16a34a; }
+
+  .codeblock {
+    font-family: "Cascadia Code", Consolas, monospace; font-size: 11px;
+    background: #f7f7f5; border: 1px solid #ccc; border-left: 4px solid #0f172a;
+    border-radius: 4px; padding: 9px 12px; margin: 0 0 10px; white-space: pre-wrap;
+  }
+  .codeblock .comment { color: #64748b; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+  .badge {
+    flex: 1 1 140px; text-align: center; border-radius: 8px; padding: 10px 8px;
+    color: #fff; font-family: "Segoe UI", Arial, sans-serif;
+  }
+  .badge .num { display: block; font-size: 22px; font-weight: 800; line-height: 1.1; }
+  .badge .lbl { display: block; font-size: 9.5px; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.9; margin-top: 2px; }
+  .b1 { background: #991b1b; }
+  .b2 { background: #16a34a; }
+  .b3 { background: #0f172a; }
+  .b4 { background: #b45309; }
+  .b5 { background: #334155; }
+  .b6 { background: #475569; }
+
+  .conf { display: inline-block; font-weight: 700; font-size: 10px; padding: 2px 9px; border-radius: 10px; }
+  .conf-high { background: #d2f8e4; color: #166534; }
+  .conf-mod { background: #fef3c7; color: #92400e; }
+
+  .header-band {
+    background: linear-gradient(135deg,#0f172a,#991b1b); color:#fff;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 4px;
+  }
+  .header-band .eyebrow { font-size: 10.5px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.85; }
+  .header-band h1 { color: #fff; font-size: 24px; margin: 4px 0 2px; }
+  .header-band .sub { font-size: 12px; opacity: 0.9; }
+
+  .page-break { page-break-before: always; }
+  @media print {
+    .wrap { max-width: none; padding: 0; }
+    .card { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header-band">
+    <div class="eyebrow">Thapar Society Nexus — Engineering Documentation</div>
+    <h1>SocMag Software Testing Guide</h1>
+    <div class="sub">How the 3-tier automated test suite proves the platform's correctness, concurrency safety, and anti-cheat integrity — with exact commands to run it yourself.</div>
+  </div>
+
+  <div class="badge-row">
+    <div class="badge b3"><span class="num">24</span><span class="lbl">Total Tests</span></div>
+    <div class="badge b2"><span class="num">100%</span><span class="lbl">Pass Rate</span></div>
+    <div class="badge b1"><span class="num">6&#47;6</span><span class="lbl">pytest (Unit)</span></div>
+    <div class="badge b4"><span class="num">15&#47;15</span><span class="lbl">Vitest (Integration)</span></div>
+    <div class="badge b5"><span class="num">3&#47;3</span><span class="lbl">Playwright (E2E)</span></div>
+    <div class="badge b6"><span class="num">3</span><span class="lbl">Tiers, 1 Pipeline</span></div>
+  </div>
+  <p style="font-size:10px;color:#64748b;text-align:center;margin:6px 0 16px;">
+    All counts and durations below are from a live re-run of the suite on 2026-11-26 — nothing here is estimated.
+  </p>
+
+  <!-- ===== THE TESTING PYRAMID ===== -->
+  <h2>1. The Testing Pyramid in SocMag</h2>
+  <div class="card">
+    <svg viewBox="0 0 600 280" style="width:100%; max-width:560px; display:block; margin:0 auto;">
+      <polygon points="300,20 220,100 380,100" fill="#991b1b" />
+      <polygon points="220,100 380,100 460,180 140,180" fill="#d97706" />
+      <polygon points="140,180 460,180 540,260 60,260" fill="#0f172a" />
+      <text x="300" y="65" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Segoe UI, Arial, sans-serif">E2E</text>
+      <text x="300" y="80" text-anchor="middle" fill="#fff" font-size="9.5" font-family="Segoe UI, Arial, sans-serif">3 tests</text>
+      <text x="300" y="144" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Integration</text>
+      <text x="300" y="160" text-anchor="middle" fill="#fff" font-size="9.5" font-family="Segoe UI, Arial, sans-serif">15 tests &#183; 8 files</text>
+      <text x="300" y="222" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="Segoe UI, Arial, sans-serif">Unit</text>
+      <text x="300" y="240" text-anchor="middle" fill="#fff" font-size="9.5" font-family="Segoe UI, Arial, sans-serif">6 tests &#183; pure math &amp; validation</text>
+      <text x="300" y="276" text-anchor="middle" fill="#64748b" font-size="9.5" font-family="Segoe UI, Arial, sans-serif">fewer, slower, higher confidence in real user flows &#8594; more, faster, isolates exact logic</text>
+    </svg>
+
+    <table>
+      <thead><tr><th>Tier</th><th>Tooling</th><th>Mechanics</th><th>Tests</th><th>Measured Run Time</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Tier 1 — Unit</strong></td>
+          <td><code>pytest</code> + FastAPI <code>TestClient</code></td>
+          <td>Calls the MLE engine's Python functions in-process. No network, no database, no browser — pure math and input validation.</td>
+          <td>6</td>
+          <td>5.53s</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 2 — Integration</strong></td>
+          <td>Vitest + live Next.js API routes</td>
+          <td>Real HTTP requests to the running Next.js dev server's API routes, hitting the real Postgres dev database through synthetic, clearly-marked fixture rows.</td>
+          <td>15</td>
+          <td>34.93s (8 files)</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 3 — End-to-End</strong></td>
+          <td>Playwright + Chromium</td>
+          <td>Drives the actual rendered UI in a real browser against both live servers (Next.js :3000 + FastAPI :8000) simultaneously — the only tier that proves a full user journey works.</td>
+          <td>3</td>
+          <td>1.2m total (12.1s / 17.6s / 12.8s per spec)</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:10.3px;color:#475569;">
+      The pyramid shape is deliberate: Tier 1 is cheap enough to run on every keystroke, Tier 2 validates every API contract against a real database, and Tier 3 is reserved for the handful of flows where only a real browser can prove the behavior — tab-switch detection and cross-account persistence, in SocMag's case.
+    </p>
+  </div>
+
+  <!-- ===== TIER 1 DEEP DIVE ===== -->
+  <h2>2. Tier 1 Deep Dive — Gaussian MLE Math Invariants</h2>
+  <div class="card accent-crimson">
+    <p><code>mle-service/main.py</code> scores a student's interest vector against a society's ideal persona by treating the persona as the mean <strong>&mu;</strong> of a multivariate Gaussian with diagonal covariance &Sigma; = I&middot;&sigma;&sup2; (&sigma; = 0.25 by default), then normalizing the student's likelihood against the Gaussian's own peak:</p>
+    <div class="codeblock">compatibility_score = 100 &times; pdf(student_vector) / pdf(ideal_persona)
+mahalanobis_distance = &radic;( &Sigma; ((student_i &minus; ideal_i) / &sigma;)&sup2; )</div>
+    <p>Because the covariance is diagonal and equal in every dimension, these two values collapse to one clean, testable relationship:</p>
+    <div class="codeblock">compatibility_score = 100 &times; exp( &minus;0.5 &times; mahalanobis_distance&sup2; )</div>
+    <p>This is exactly why the suite can assert on round numbers instead of approximate floats:</p>
+    <table>
+      <thead><tr><th>Invariant</th><th>Proven by</th><th>Why it must hold</th></tr></thead>
+      <tbody>
+        <tr><td>distance = 0 &#8658; score = <strong>exactly 100.0</strong></td><td>TC-MLE-02</td><td>At the mean, the exponent is 0 and <code>exp(0) = 1</code> — a perfect match must score perfectly, not 99.9-something.</td></tr>
+        <tr><td>distance &gt; 10 &#8658; score &lt; 1.0</td><td>TC-MLE-03</td><td><code>exp(-0.5 &times; 10&sup2;) &asymp; 10&#8315;&sup2;&sup2;</code> — opposite interests must collapse toward zero, not plateau at a misleading "medium" score.</td></tr>
+        <tr><td>Score is monotonically decreasing in distance</td><td>TC-MLE-02 + TC-MLE-03 together</td><td>A student closer to the ideal persona must never score lower than one further away — the core promise of the matching feature.</td></tr>
+        <tr><td><code>feature_vector</code> and <code>ideal_persona</code> key sets must match exactly &#8594; 400</td><td>TC-MLE-04</td><td>Comparing dimensions that don't correspond would silently miscompute the distance instead of failing loudly.</td></tr>
+        <tr><td>Every key must be one of the 8 fixed <code>INTEREST_TAGS</code> &#8594; 400</td><td>TC-MLE-05</td><td>Prevents a typo'd or stale client tag from being scored as a legitimate interest dimension.</td></tr>
+        <tr><td>Missing required field &#8594; 422</td><td>TC-MLE-06</td><td>Enforced for free by the Pydantic <code>MLERequest</code> schema, before <code>mle_engine</code>'s body ever runs.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== TIER 2 DEEP DIVE ===== -->
+  <h2 class="page-break">3. Tier 2 Deep Dive — Atomic Concurrency &amp; Campus-Restricted RBAC</h2>
+
+  <div class="card accent-amber">
+    <h3>3.1 Zero-Double-Booking: the atomic slot guard</h3>
+    <p>Interview slots are a scarce, shared resource — two students must never be assigned the same physical slot, even if both click "Book" at the same instant. SocMag doesn't rely on a prior <code>SELECT</code> check (which is itself race-prone); the guard is a single atomic <code>UPDATE</code> inside a transaction, in <code>frontend/app/api/slots/book/route.ts</code>:</p>
+    <div class="codeblock">BEGIN;
+UPDATE slot_bookings
+SET application_id = $1, booked_at = now()
+WHERE id = $2 AND application_id IS NULL   <span class="comment">-- the entire guard lives in this predicate</span>
+RETURNING id, slot_date, slot_time, venue;
+<span class="comment">-- rowCount === 0  =&gt;  ROLLBACK, respond 409 (someone else won the race)
+-- rowCount === 1  =&gt;  mark the application Interview_Booked, COMMIT</span></div>
+    <p><strong>Note on terminology:</strong> the read-side endpoint (<code>GET /api/slots?status=available</code>) exposes a convenience <code>status</code> filter for the UI's slot picker, but the actual concurrency-safety mechanism is the write-side predicate above — Postgres only lets one concurrent <code>UPDATE</code> win the row, so <code>application_id IS NULL</code> can never be true for two requests at once. This is what makes the guard atomic, not the read-side filter.</p>
+    <p><strong>TC-SLOT-01 / TC-SLOT-02</strong> prove both halves: a slot with <code>application_id IS NULL</code> can be booked (200, status flips to <code>booked</code>), and immediately re-booking the same slot is rejected (409, transaction rolled back, original booking untouched).</p>
+  </div>
+
+  <div class="card accent-navy">
+    <h3>3.2 Campus-Restricted Auth &amp; Role-Based Access</h3>
+    <p><code>frontend/app/api/auth/login/route.ts</code> enforces the <code>@thapar.edu</code> domain with a regex check <em>before</em> any database query runs, then verifies the password with <code>bcrypt.compare</code> against the stored hash, and finally returns a <code>role</code> (<code>student</code> / <code>society manager</code>) that the frontend uses to route into the correct dashboard.</p>
+    <table>
+      <thead><tr><th>Check</th><th>Proven by</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Valid <code>@thapar.edu</code> email + correct password</td><td>TC-AUTH-01</td><td>200, role returned, routed by role</td></tr>
+        <tr><td>Non-institutional email domain</td><td>TC-AUTH-02</td><td>400, rejected before any DB lookup</td></tr>
+        <tr><td>Correct email, wrong password</td><td>TC-AUTH-03</td><td>401</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:10.3px;color:#991b1b;">
+      <strong>Honest RBAC gap:</strong> the login boundary itself is fully tested, but role <em>isolation</em> is only partially covered. <code>PATCH /api/societies/[id]</code> does implement a real ownership check (403 if the requesting manager doesn't own that society) — but it has no automated test at all. The grading routes (<code>POST /api/grades</code>) implement <em>no</code> ownership check in the source, and there is no test exercising cross-manager access either. Treat "RBAC" as verified at the authentication boundary, not yet at the manager-to-manager isolation boundary.
+    </p>
+  </div>
+
+  <!-- ===== TIER 3 DEEP DIVE ===== -->
+  <h2>4. Tier 3 Deep Dive — Real-Browser Proctoring &amp; Cross-Account Persistence</h2>
+  <div class="card accent-green">
+    <p>Two things in SocMag can only be proven by a real browser, not a mocked request — Playwright is reserved for exactly these:</p>
+    <h3>4.1 Anti-cheat proctoring (TC-E2E-02)</h3>
+    <p><code>app/student/societies/[id]/assessment/page.tsx</code> attaches real <code>visibilitychange</code>, <code>blur</code>, and <code>focus</code> listeners when the proctored test loads. The test dispatches a synthetic <code>document.hidden = true</code> via <code>page.evaluate</code> and asserts the "Tab switch detected" banner plus a live "1 switches" counter appear — then dispatches real <code>blur</code>, waits <strong>1100ms of real wall-clock time</strong>, dispatches <code>focus</code>, and asserts an away-time counter matching <code>/[1-9]\d*s away/</code>. The deliberate real-time wait (not a mocked clock) is what proves the away-duration math itself is correct, not just that the event fired.</p>
+    <h3>4.2 Cross-account, server-side persistence (TC-E2E-03)</h3>
+    <p>After a Non-Tech manager clicks the GREEN grade dot on <code>/manager/grading</code>, the test performs a full <code>page.reload()</code> and re-asserts the dot's background color is still set. This is the one check that can't be faked by React state surviving a soft navigation — a hard reload discards all client state, so a grade still showing GREEN afterward proves it round-tripped through <code>POST /api/grades</code> into Postgres and back out through <code>GET /api/grades</code>. The same spec also logs in as two different real accounts in sequence (student &#8594; manager) via a <code>switchAccount</code> helper, proving the booking-then-grading handoff works across a real session boundary, not just within one logged-in user's state.</p>
+  </div>
+
+  <!-- ===== RUNBOOK ===== -->
+  <h2 class="page-break">5. Practical Testing Runbook</h2>
+  <div class="card">
+    <h3>5.1 Tier 1 — Unit tests (pytest)</h3>
+    <div class="codeblock"><span class="comment"># from the repo root, in PowerShell</span>
+cd mle-service
+.venv\Scripts\Activate.ps1
+pytest -v</div>
+
+    <h3>5.2 Tier 2 — Integration tests (Vitest, needs both servers' env config but no servers running)</h3>
+    <div class="codeblock">cd frontend
+npm run test:integration</div>
+    <p style="font-size:10.3px;color:#475569;">Reads <code>DATABASE_URL</code> from <code>frontend/.env.local</code> and talks directly to the dev Postgres database — it does not need <code>npm run dev</code> running, since it calls the route handlers' logic through Vitest, not over HTTP to a live port.</p>
+
+    <h3>5.3 Tier 3 — End-to-end tests (Playwright; spins up both live servers itself)</h3>
+    <div class="codeblock"><span class="comment"># headless, the default used for CI-style runs</span>
+cd frontend
+npm run test:e2e
+
+<span class="comment"># headed: watch the real Chromium window click through each flow</span>
+npx playwright test --headed
+
+<span class="comment"># interactive UI mode: step through, time-travel, and inspect each assertion</span>
+npx playwright test --ui
+
+<span class="comment"># run just one spec, headed</span>
+npx playwright test e2e/track-a-assessment.spec.ts --headed</div>
+    <p style="font-size:10.3px;color:#475569;">Playwright's own <code>webServer</code> config (<code>frontend/playwright.config.ts</code>) boots both <code>uvicorn main:app --port 8000</code> and <code>next dev</code> automatically and reuses them if already running — you don't need to start either server by hand first.</p>
+  </div>
+
+  <!-- ===== CONFIDENCE SUMMARY ===== -->
+  <h2>6. Confidence Summary</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Dimension</th><th>Evidence</th><th>Confidence</th><th>Caveats</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Security / RBAC</td><td>TC-AUTH-01…03</td>
+          <td><span class="conf conf-mod">MODERATE</span></td>
+          <td>Login boundary (domain + password) is fully verified. Manager-to-manager isolation is not: <code>PATCH /api/societies/[id]</code>'s ownership check is untested, and the grading routes have no ownership check to test at all.</td>
+        </tr>
+        <tr>
+          <td>MLE Math</td><td>TC-MLE-01…06</td>
+          <td><span class="conf conf-high">HIGH</span></td>
+          <td>Both closed-form extremes (perfect match, opposite vectors) and all three input-validation branches are directly verified against the derived <code>100 &times; exp(-0.5d&sup2;)</code> relationship.</td>
+        </tr>
+        <tr>
+          <td>Concurrency / 0% Double-Booking</td><td>TC-SLOT-01, TC-SLOT-02</td>
+          <td><span class="conf conf-mod">HIGH (sequential) / MODERATE (concurrent)</span></td>
+          <td>The atomic <code>UPDATE … WHERE application_id IS NULL</code> guard is proven against a sequential re-booking attempt. A true simultaneous race was checked manually once during development, but has no automated regression test.</td>
+        </tr>
+        <tr>
+          <td>Anti-Cheat Proctoring</td><td>TC-E2E-02</td>
+          <td><span class="conf conf-high">HIGH</span></td>
+          <td>Both tab-switch detection and real-time away-duration tracking are verified end-to-end in a live Chromium browser, not mocked.</td>
+        </tr>
+        <tr>
+          <td>Persistence</td><td>TC-E2E-03</td>
+          <td><span class="conf conf-high">HIGH</span></td>
+          <td>Verified across a hard page reload <em>and</em> a real cross-account session switch — the strongest persistence check the suite performs.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:9.8px;color:#94a3b8;text-align:center;margin-top:10px;">
+    Generated from the live state of the repository and a real re-run of all three test tiers on 2026-11-26. See <code>docs/SocMag_Test_Cases.html</code> for the full per-test IEEE-style specification this guide summarizes.
+  </p>
+
+</div>
+</body>
+</html>

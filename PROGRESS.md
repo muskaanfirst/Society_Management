@@ -46,6 +46,78 @@
       confirmed the polished login page shows no prototype copy and that
       the "Student" quick sign-in button still logs in for real (landed on
       `/student/societies`), proving the login logic itself was untouched.
+- [x] `docs/SocMag_Software_Testing_Guide.html` -- crisp ~5-6 page engineering
+      manual (A4-print-styled: header band + metric badges, card layout,
+      SVG Testing Pyramid diagram), companion to the full Test Case
+      Specification above. Reuses the same live 2026-11-26 re-run numbers
+      (6/6 pytest, 15/15 Vitest across 8 files, 3/3 Playwright) -- no new
+      test run was needed since nothing changed between the two docs.
+
+      Covers: metric badge header; a Testing Pyramid comparison table
+      (tooling/mechanics/measured run time per tier); a Tier 1 deep dive
+      deriving the MLE's closed-form `compatibility_score = 100 *
+      exp(-0.5 * mahalanobis_distance^2)` relationship from the actual
+      Gaussian-likelihood code and tying each invariant to its test; a
+      Tier 2 deep dive on the atomic `UPDATE ... WHERE application_id IS
+      NULL` slot-booking guard (corrected from the request's
+      `status='available'` phrasing, which is only the read-side list
+      filter, not the actual write-side concurrency guard) plus
+      `@thapar.edu` auth/RBAC, with the same manager-isolation gap flagged
+      honestly as in the Test Case doc; a Tier 3 deep dive on Playwright's
+      synthetic `visibilitychange`/real-time blur-focus anti-cheat check
+      and the hard-reload cross-account persistence check; a copy-paste
+      runbook (pytest, `npm run test:integration`, `npm run test:e2e`,
+      plus `--headed` / `--ui` / single-spec Playwright invocations); and
+      a Confidence Summary table that rates RBAC and true-concurrency
+      coverage as only MODERATE rather than inflating them to HIGH, for
+      the same honest reasons documented in the Test Case spec's gaps
+      section.
+
+      VERIFIED: opened the generated HTML in the browser pane and visually
+      confirmed the header/badges, SVG pyramid diagram, all three deep-dive
+      cards, the runbook code blocks, and the confidence table all render
+      correctly.
+- [x] `docs/SocMag_Test_Cases.html` -- formal IEEE/academic-style Test Case
+      Specification document, print-ready for A4 PDF export. Pure
+      documentation: no application code, test code, or config was modified
+      -- only read for inspection, plus a fresh live re-run of all 3 tiers
+      to capture real numbers (never invented, per project rule).
+
+      Contents: title page (team/advisor/date as given); Summary of Results
+      (by suite, by type, by feature area with positive/negative counts);
+      one detailed structured table per test for all 24 test cases
+      (TC-MLE-01..06, TC-AUTH-01..03, TC-SOC-01, TC-COMPAT-01, TC-SLOT-01..02,
+      TC-TEST-01..02, TC-PORT-01..02, TC-GRAD-01..03, TC-EVNT-01,
+      TC-E2E-01..03) with exact file:line test location and exact
+      source-file:line-range + route/function "code under test", verified
+      against the actual files on disk; 4 traceability matrices (API
+      endpoints, user roles, source files, SRS requirements); and a Manual
+      Validation & Known Coverage Gaps section.
+
+      Live re-run numbers captured this session (2026-11-26): Tier 1
+      (pytest) 6/6 passed in 5.53s; Tier 2 (`npm run test:integration`,
+      vitest) 15/15 passed across 8 files in 34.93s; Tier 3
+      (`npm run test:e2e`, Playwright) 3/3 passed, 1.2m wall time.
+
+      SRS requirement IDs (FR-1..FR-9) were synthesized from the actual
+      built feature set, flagged in the document itself, since no formal
+      SRS exists in this repo yet.
+
+      Honestly documented coverage gaps: `POST /api/events/register` and
+      `PATCH /api/societies/[id]` have zero automated test coverage in any
+      tier; `POST /api/grades` is only tested for its `rubric` action, not
+      `shortlist`/`bulkShortlistGreen`; several GET/setup routes
+      (`/api/applications`, `/api/slots`, `/api/test-questions`) are only
+      exercised indirectly through the Playwright UI flows; no test
+      verifies a manager is blocked from grading a society they don't
+      manage (the grading routes implement no such check at all); and
+      TC-SLOT-02's double-booking guard test is sequential, not a true
+      concurrent race (that was checked manually only).
+
+      VERIFIED: opened the generated HTML in the browser pane and visually
+      confirmed every section renders correctly -- title page, all 3
+      summary tables (totals cross-checked to 24), all 24 test-case cards,
+      all 4 traceability matrices, and the gaps section.
 - [x] 3-tier automated test suite, built and run to 100% green for real.
 
       **The one real design problem**: Tiers 2 and 3 hit the live API routes
