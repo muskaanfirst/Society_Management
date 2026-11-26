@@ -12,6 +12,9 @@ node_modules/
 
 # testing
 coverage/
+/frontend/test-results/
+/frontend/playwright-report/
+/frontend/playwright/.cache/
 
 # next.js
 .next/
