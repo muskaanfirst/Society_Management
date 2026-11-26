@@ -1,5 +1,70 @@
 # Project Progress
 
+- [x] 3-tier automated test suite, built and run to 100% green for real.
+
+      **The one real design problem**: Tiers 2 and 3 hit the live API routes
+      against the live dev Postgres database -- the same one manually
+      demoed against all session (several real seed slots already booked,
+      real applications already graded). A naive test suite would quietly
+      corrupt that demo data. Fixed with one shared fixture convention used
+      by both tiers (`frontend/tests/helpers/testDb.ts`): every row a test
+      creates is synthetic and clearly marked -- user ids/emails prefixed
+      `test-`/`test.`, slot venues prefixed `TEST-` and dated in 2099 -- and
+      cleanup deletes *by those markers*, not specific ids, so it's safe
+      and idempotent even after a crashed prior run. Verified directly
+      against the live DB after real runs: zero leftover `test-%` rows,
+      every time.
+
+      **Tier 1** -- `mle-service/test_main.py` (pytest + FastAPI
+      `TestClient`, `pytest`/`httpx` added to `requirements.txt`): health
+      check, perfect-match -> 100%, opposite vectors -> ~0%, mismatched
+      keys -> 400, unknown tag -> 400, missing field -> 422.
+      REAL RESULT: **6 passed in 2.93s**.
+
+      **Tier 2** -- `frontend/tests/*.test.ts` (vitest, installed with
+      `vite` as its required peer dep). `tests/globalSetup.ts` spawns both
+      mle-service and `next dev` itself and tears them down after, so
+      `npm run test:integration` needs no manually-started servers. Covers
+      `/api/auth/login` (valid / non-@thapar.edu / wrong-password),
+      `/api/societies`, `/api/calculate-compatibility`, `/api/slots/book`
+      (including the atomic double-booking 409), `/api/test-submit`,
+      `/api/applications/portfolio`, `/api/grades`, `/api/events`.
+      REAL RESULT: **8 test files, 15 tests passed in 26.57s**.
+
+      **Tier 3** -- `frontend/e2e/*.spec.ts` (`@playwright/test`, Chromium
+      only). `playwright.config.ts`'s `webServer` array starts both
+      servers; `e2e/globalSetup.ts`/`globalTeardown.ts` create/destroy the
+      synthetic e2e student + two throwaway slots. Three specs: (a) student
+      onboarding quiz -> real MLE compatibility scores show up; (b) Track A
+      assessment -- answers all 8 questions, flags a real `visibilitychange`
+      tab-switch (dispatched via `page.evaluate`, since real OS-level
+      switches can't be simulated in a test runner -- the same technique
+      used earlier this session to verify it manually) and a real
+      blur/focus focus-loss duration, submits, confirms a real score; (c)
+      Track B -- books a real interview slot through the UI, then as the
+      real Non-Tech manager grades it GREEN and confirms the grade survives
+      a hard page reload (proving it's server state, not local UI state).
+      REAL RESULT: **3 passed in 44.2s** (confirmed stable across 3
+      consecutive clean runs before this one).
+
+      Real bugs found and fixed along the way (not scope creep -- these
+      were blocking a green run): spawning `npm.cmd` directly on Windows
+      reproducibly throws `EINVAL`; the `shell: true` workaround for that
+      silently breaks Next's own `.env.local` loading in a spawned child
+      (every DB route 500s with "DATABASE_URL is not set") -- fixed by
+      spawning Next's CLI entry directly via `node` and explicitly passing
+      the parsed `.env.local` through the child's `env`. An async
+      `exec()`-based process-tree kill let vitest exit before `taskkill`
+      finished, leaking the whole server tree (confirmed via `netstat` --
+      fixed with a blocking `execSync`). Several Playwright locators hit
+      strict-mode ambiguity (e.g. "Next" substring-matching Next.js's own
+      dev-tools button) or a race where the onboarding quiz remounts after
+      every full page navigation, not just the first -- all fixed and
+      re-verified.
+
+      `npx tsc --noEmit`, `npm run lint`, and `npm run build` all still
+      pass clean with the new test tooling in place. `.gitignore` updated
+      for `frontend/test-results/`, `frontend/playwright-report/`.
 - [x] UI interactivity pass on top of the Pastel Bento-Grid design: filter
       pills, date-strip filters, tactile micro-interactions, and toast
       notifications -- React state + Tailwind transitions only, no new npm
